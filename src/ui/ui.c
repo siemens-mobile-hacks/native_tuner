@@ -153,7 +153,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
 
     const int submess = msg->gbsmsg->submess;
     if (msg->keys == 0x3D) {
-        fmdl_set_power(!fmdl_get_power_state());
+        Tuner_SetPower(!Tuner_GetPowerState());
         DirectRedrawGUI();
         return -1;
     } else if (msg->keys == 0x01) {
@@ -270,7 +270,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
 static void GHook(GUI *gui, int cmd) {
     UI_DATA *data = TViewGetUserPointer(gui);
     if (cmd == UI_CMD_REDRAW) {
-        SOFTKEY_D[1].lgp_id = (fmdl_get_power_state() == 0) ? LGP_PLAY_PIC : LGP_PAUSE_PIC;
+        SOFTKEY_D[1].lgp_id = (Tuner_GetPowerState() == 0) ? LGP_PLAY_PIC : LGP_PAUSE_PIC;
         SetMenuSoftKey(gui, &SOFTKEY_D[1], SET_MIDDLE_SOFTKEY);
     } else if (cmd == UI_CMD_CREATE) {
         static GUI_METHODS methods;

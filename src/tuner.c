@@ -26,10 +26,18 @@ static void CB_GetCurrentLevel(int state, const uint8_t *level) {
     }
 }
 
+int Tuner_SetPower(int power) {
+    return fmdl_set_power(power);
+}
+
+int Tuner_GetPowerState() {
+    return fmdl_get_power_state();
+}
+
 int Tuner_Init(TUNER *tuner) {
     zeromem(&tuner->volume, sizeof(TUNER_VOLUME));
     MutexCreate(&tuner->volume.mtx);
-    if (fmdl_set_power(1) == 0) {
+    if (Tuner_SetPower(1) == 0) {
         Tuner_SetFreq(104200);
         uint32_t err;
         tuner->hobj = Obs_CreateObject(0x4B,0x34,1,0x7000,1,0, &err);
@@ -42,14 +50,14 @@ int Tuner_Init(TUNER *tuner) {
             }
         }
     }
-    fmdl_set_power(0);
+    Tuner_SetPower(0);
     Obs_DestroyObject(tuner->hobj);
     tuner->hobj = 0;
     return 0;
 }
 
 void Tuner_Destroy(TUNER *tuner) {
-    fmdl_set_power(0);
+    Tuner_SetPower(0);
     Obs_DestroyObject(tuner->hobj);
     MutexDestroy(&tuner->volume.mtx);
 }
