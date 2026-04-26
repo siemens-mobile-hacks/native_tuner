@@ -25,14 +25,14 @@ static SOFTKEYSTAB SOFTKEYS_TAB = {
 };
 
 void UI_DrawBackground(const UI_DATA *data) {
-    if (IMAGES) {
+    if (THEME.images) {
         DrawCroppedIMGHDR(0, YDISP, 0, YDISP + GLOBAL_OFFSET_Y, ScreenW(), ScreenH() - SoftkeyH(),
-            0, IMAGES[IMG_BG]);
+            0, THEME.images[IMG_BG]);
     }
 }
 
 void UI_DrawMainInfo(const UI_DATA *data) {
-    if (IMAGES) {
+    if (THEME.images) {
         WSHDR ws;
         char str[32];
         uint16_t wsbody[32];
@@ -53,7 +53,7 @@ void UI_DrawMainInfo(const UI_DATA *data) {
         h = GetFontYSIZE(font);
         x2 = x + w;
         y2 = y + h;
-        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, THEME.images[IMG_BG]);
         DrawString(&ws, x, y, x2, y2, font, TEXT_ALIGNMIDDLE,
             GetPaletteAdrByColorIndex(0), GetPaletteAdrByColorIndex(23));
         //bm
@@ -63,7 +63,7 @@ void UI_DrawMainInfo(const UI_DATA *data) {
         h = GetFontYSIZE(font);
         x2 = x + w;
         y2 = y + h;
-        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, THEME.images[IMG_BG]);
         if (data->bm >= 0) {
             wsprintf(&ws, "%d", data->bm + 1);
             DrawString(&ws, x, y, x2, y2, font, TEXT_ALIGNMIDDLE,
@@ -73,92 +73,92 @@ void UI_DrawMainInfo(const UI_DATA *data) {
 }
 
 void UI_DrawArrowLeft(const UI_DATA *data) {
-    if (IMAGES) {
-        DrawIMGHDR(UI_ARROW_LEFT_X, UI_ARROW_LEFT_Y, IMAGES[IMG_ARROW_LEFT]);
+    if (THEME.images) {
+        DrawIMGHDR(UI_ARROW_LEFT_X, UI_ARROW_LEFT_Y, THEME.images[IMG_ARROW_LEFT]);
     }
 }
 
 void UI_DrawArrowRight(const UI_DATA *data) {
-    if (IMAGES) {
-        DrawIMGHDR(UI_ARROW_RIGHT_X, UI_ARROW_RIGHT_Y, IMAGES[IMG_ARROW_RIGHT]);
+    if (THEME.images) {
+        DrawIMGHDR(UI_ARROW_RIGHT_X, UI_ARROW_RIGHT_Y, THEME.images[IMG_ARROW_RIGHT]);
     }
 }
 
 void UI_DrawArrowUp(const UI_DATA *data) {
-    if (IMAGES) {
-        DrawIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, IMAGES[IMG_ARROW_UP]);
+    if (THEME.images) {
+        DrawIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, THEME.images[IMG_ARROW_UP]);
     }
 }
 
 void UI_DrawArrowDown(const UI_DATA *data) {
-    if (IMAGES) {
-        DrawIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, IMAGES[IMG_ARROW_DOWN]);
+    if (THEME.images) {
+        DrawIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, THEME.images[IMG_ARROW_DOWN]);
     }
 }
 
 void UI_ClearArrowUp(const UI_DATA *data) {
-    if (IMAGES) {
-        const int w = IMAGES[IMG_ARROW_UP]->w;
-        const int h = IMAGES[IMG_ARROW_UP]->h;
+    if (THEME.images) {
+        const int w = THEME.images[IMG_ARROW_UP]->w;
+        const int h = THEME.images[IMG_ARROW_UP]->h;
         DrawCroppedIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, UI_ARROW_UP_X, UI_ARROW_UP_Y + GLOBAL_OFFSET_Y,
-            w, h, 0, IMAGES[IMG_BG]);
+            w, h, 0, THEME.images[IMG_BG]);
     }
 }
 
 void UI_ClearArrowDown(const UI_DATA *data) {
-    if (IMAGES) {
-        const int w = IMAGES[IMG_ARROW_DOWN]->w;
-        const int h = IMAGES[IMG_ARROW_DOWN]->h;
+    if (THEME.images) {
+        const int w = THEME.images[IMG_ARROW_DOWN]->w;
+        const int h = THEME.images[IMG_ARROW_DOWN]->h;
         DrawCroppedIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y + GLOBAL_OFFSET_Y,
-            w, h, 0, IMAGES[IMG_BG]);
+            w, h, 0, THEME.images[IMG_BG]);
     }
 }
 
 void UI_DrawVolume(const UI_DATA *data) {
-    if (IMAGES) {
+    if (THEME.images) {
         const int x = UI_VOLUME_X;
         const int y = UI_VOLUME_Y;
-        const int w = IMAGES[IMG_VOLUME]->w;
+        const int w = THEME.images[IMG_VOLUME]->w;
         const int h = UI_VOLUME_H;
         if (data->csm->tuner.volume.volume) {
             const int offset_y = h * (data->csm->tuner.volume.volume - 1);
-            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, IMAGES[IMG_VOLUME]);
+            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, THEME.images[IMG_VOLUME]);
         } else {
-            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, THEME.images[IMG_BG]);
         }
         if (data->csm->tuner.volume.is_mute) {
-            DrawIMGHDR(UI_VOLUME_MUTE_X, UI_VOLUME_MUTE_Y, IMAGES[IMG_MUTE]);
+            DrawIMGHDR(UI_VOLUME_MUTE_X, UI_VOLUME_MUTE_Y, THEME.images[IMG_MUTE]);
         }
     }
 }
 
 void UI_DrawLevel(const UI_DATA *data) {
-    if (IMAGES) {
+    if (THEME.images) {
         const int x = UI_LEVEL_X;
         const int y = UI_LEVEL_Y;
-        const int w = IMAGES[IMG_COVERAGE]->w;
+        const int w = THEME.images[IMG_COVERAGE]->w;
         const int h = UI_LEVEL_H;
         if (data->csm->tuner.level) {
             const int offset_y = h * (data->csm->tuner.level - 1);
-            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, IMAGES[IMG_COVERAGE]);
+            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, THEME.images[IMG_COVERAGE]);
         } else {
-            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, THEME.images[IMG_BG]);
         }
     }
 }
 
 void UI_DrawStereoStatus(const UI_DATA *data) {
-    if (IMAGES) {
+    if (THEME.images) {
         int x = UI_STEREO_STATUS_X;
         const int y = UI_STEREO_STATUS_Y;
         const int w = UI_STEREO_STATUS_W;
         const int h = UI_STEREO_STATUS_H;
-        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, THEME.images[IMG_BG]);
         if (data->csm->tuner.stereo_status > 0) {
-            DrawIMGHDR(x, y, IMAGES[IMG_STEREO]);
+            DrawIMGHDR(x, y, THEME.images[IMG_STEREO]);
         } else {
-            x += (w - IMAGES[IMG_MONO]->w) / 2;
-            DrawIMGHDR(x, y, IMAGES[IMG_MONO]);
+            x += (w - THEME.images[IMG_MONO]->w) / 2;
+            DrawIMGHDR(x, y, THEME.images[IMG_MONO]);
         }
     }
 }

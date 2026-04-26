@@ -30,7 +30,7 @@ static const SOFTKEYSTAB SOFTKEYS_TAB = {
 static void Theme_Proc(GUI *gui) {
     void *data = MenuGetUserPointer(gui);
     const UI_DATA *ui_data = TViewGetUserPointer(data);
-    SUBPROC(UI_LoadImages, (ui_data->csm->theme.current == UI_THEME_WHITE) ? UI_THEME_BLACK : UI_THEME_WHITE);
+    SUBPROC(UI_LoadTheme, (ui_data->theme_type == UI_THEME_TYPE_WHITE) ? UI_THEME_TYPE_BLACK : UI_THEME_TYPE_WHITE);
     GeneralFuncF1(1);
 }
 
@@ -71,7 +71,7 @@ static void ItemProc(void *gui, int item_n, void *user_pointer) {
     void *item = AllocMenuItem(gui);
     WSHDR *ws = AllocMenuWS(gui, 128);
     if (item_n == ITEM_THEME) {
-        wsprintf(ws, "%t [%s]", desc->lgp_id_small, (ui_data->csm->theme.current == UI_THEME_WHITE) ? "White" : "Black");
+        wsprintf(ws, "%t [%s]", desc->lgp_id_small, (ui_data->theme_type == UI_THEME_TYPE_WHITE) ? "White" : "Black");
     } else {
         wsprintf(ws, "%t", desc->lgp_id_small);
     }

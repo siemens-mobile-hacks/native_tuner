@@ -15,12 +15,12 @@ unsigned short maincsm_name_body[140];
 
 static void InitBackground() {
     KeyHook_Init();
-    UI_LoadImages(UI_THEME_WHITE);
+    UI_LoadTheme(UI_THEME_TYPE_WHITE);
 }
 
 static void DestroyBackground() {
     KeyHook_Destroy();
-    UI_DestroyImages(&IMAGES);
+    UI_DestroyTheme();
     kill_elf();
 }
 
@@ -62,31 +62,34 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     } else if (msg->msg == MSG_IPC) {
         IPC_REQ *ipc = msg->data0;
         if (strcmpi(ipc->name_to, IPC_NAME) == 0) {
-            if (msg->submess == IPC_LOAD_IMAGES_START) {
-                csm->theme.temp = (int)ipc->data;
+            if (msg->submess == IPC_LOAD_THEME_START) {
+                csm->temp.theme_type = (int)ipc->data;
                 if (!csm->please_wait_gui_id) {
                     csm->please_wait_gui_id = ShowPleaseWaitBox(1);
                 }
-            } else if (msg->submess == IPC_LOAD_IMAGES_END) {
+            } else if (msg->submess == IPC_LOAD_THEME_END) {
+                UI_DATA *ui_data = GetUIData(csm);
                 if (csm->please_wait_gui_id) {
                     GeneralFunc_flag1(csm->please_wait_gui_id, 1);
                     csm->please_wait_gui_id = 0;
                 }
                 IMGHDR **images = ipc->data;
                 if (images) {
-                    IMAGES = images;
-                    csm->theme.current = csm->theme.temp;
+                    THEME.images = images;
+                    if (ui_data) {
+                        ui_data->theme_type = csm->temp.theme_type;
+                    }
                 } else {
                     MsgBoxError(0x11, (int)"Failed to load images");
-                    if (!IMAGES) {
+                    if (!THEME.images) {
                         csm->csm.state = CSM_STATE_CLOSED;
                     }
                 }
             } else if (msg->submess == IPC_TUNER_SET_FREQ_TEMP) {
-                csm->freq_tmp = (uint32_t)ipc->data;
+                csm->temp.freq = (uint32_t)ipc->data;
             } else if (msg->submess == IPC_TUNER_SET_FREQ) {
                 UI_DATA *ui_data = GetUIData(csm);
-                csm->tuner.freq = csm->freq_tmp;
+                csm->tuner.freq = csm->temp.freq;
                 if (ui_data) {
                     ui_data->bm = Bookmarks_Find(csm->tuner.freq);
                     if (IsGuiOnTop(csm->gui_id)) {

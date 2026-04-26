@@ -3,8 +3,8 @@
 #include <swilib.h>
 
 enum {
-    IPC_LOAD_IMAGES_START,
-    IPC_LOAD_IMAGES_END,
+    IPC_LOAD_THEME_START,
+    IPC_LOAD_THEME_END,
     //
     IPC_TUNER_SET_FREQ,
     IPC_TUNER_SET_FREQ_TEMP,
