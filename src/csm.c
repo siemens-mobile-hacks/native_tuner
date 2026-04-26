@@ -80,7 +80,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                         csm->csm.state = CSM_STATE_CLOSED;
                     }
                 }
-            } else if (msg->submess == IPC_TUNER_SET_FREQ_TMP) {
+            } else if (msg->submess == IPC_TUNER_SET_FREQ_TEMP) {
                 csm->freq_tmp = (uint32_t)ipc->data;
             } else if (msg->submess == IPC_TUNER_SET_FREQ) {
                 UI_DATA *ui_data = GetUIData(csm);
@@ -94,7 +94,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                 csm->tuner.level = 0;
                 // csm->tuner.stereo_status = 0;
                 csm->csm.state = CSM_STATE_UPDATE_INFO;
-            } else if (msg->submess == IPC_TUNER_START_SEEK) {
+            } else if (msg->submess == IPC_TUNER_SEEK_START) {
                 UI_DATA *ui_data = GetUIData(csm);
                 if (ui_data) {
                     ui_data->seek_on = 1;
@@ -103,7 +103,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                     }
                     ui_data->bm = -1;
                 }
-            } else if (msg->submess == IPC_TUNER_STOP_SEEK) {
+            } else if (msg->submess == IPC_TUNER_SEEK_FINISHED) {
                 UI_DATA *ui_data = GetUIData(csm);
                 if (ui_data) {
                     ui_data->seek_on = 0;
