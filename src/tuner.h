@@ -2,6 +2,7 @@
 
 #include <swilib.h>
 
+#define TUNER_MSG_OBS 0x9990
 #define TUNER_MIN_FREQ 87500
 #define TUNER_MAX_FREQ 108000
 

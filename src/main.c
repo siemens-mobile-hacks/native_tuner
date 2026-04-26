@@ -53,7 +53,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     MAIN_CSM *csm = (MAIN_CSM*)data;
     if ((msg->msg == MSG_GUI_DESTROYED) && ((int)msg->data0 == csm->gui_id)) {
         csm->csm.state = CSM_STATE_CLOSED;
-    } else if (msg->msg == 0x7000) {
+    } else if (msg->msg == TUNER_MSG_OBS) {
         Obs_Sound_SetPurpose(csm->tuner.hobj, 0x21);
         Obs_Mam_SetPurpose(csm->tuner.hobj, 0x21);
         Obs_Start(csm->tuner.hobj);

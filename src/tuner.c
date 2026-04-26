@@ -1,9 +1,6 @@
 #include <swilib.h>
 #include "ipc.h"
 #include "tuner.h"
-
-#include <stdio.h>
-
 #include "functions.h"
 
 static void CB_SetFreq() {
@@ -36,7 +33,7 @@ int Tuner_Init(TUNER *tuner) {
     if (Tuner_SetPower(1) == 0) {
         Tuner_SetFreq(104200);
         uint32_t err;
-        tuner->hobj = Obs_CreateObject(0x4B,0x34,1,0x7000,1,0, &err);
+        tuner->hobj = Obs_CreateObject(0x4B,0x34,1,TUNER_MSG_OBS,1,0, &err);
         if (tuner->hobj) {
             Obs_Sound_SetLogSourceEx(tuner->hobj, 3);
             Tuner_SetVolume(tuner, 5);
