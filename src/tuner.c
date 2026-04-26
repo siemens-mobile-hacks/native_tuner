@@ -36,7 +36,6 @@ int Tuner_Init(TUNER *tuner) {
     zeromem(&tuner->volume, sizeof(TUNER_VOLUME));
     MutexCreate(&tuner->volume.mtx);
     if (Tuner_SetPower(1) == 0) {
-        Tuner_SetFreq(104200);
         uint32_t err;
         tuner->hobj = Obs_CreateObject(0x4B,0x34,1,TUNER_MSG_OBS,1,0, &err);
         if (tuner->hobj) {

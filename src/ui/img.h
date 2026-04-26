@@ -1,4 +1,8 @@
 #pragma once
 
-IMGHDR **LoadImages(UI_STYLE style);
-void DestroyImages(IMGHDR ***images);
+#include "ui_theme.h"
+
+void UI_LoadImages(UI_THEME theme);
+void UI_DestroyImages(IMGHDR ***images);
+
+extern IMGHDR **IMAGES;

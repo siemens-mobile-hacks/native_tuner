@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "ui.h"
-#include "img.h"
 #include "layout.h"
 #include "../ipc.h"
 #include "../bookmarks.h"
@@ -24,115 +23,142 @@ static SOFTKEYSTAB SOFTKEYS_TAB = {
     SOFTKEY_D, 3
 };
 
-void UI_DrawMainInfo(const UI_DATA *data) {
-    WSHDR ws;
-    char str[32];
-    uint16_t wsbody[32];
-    CreateLocalWS(&ws, wsbody, 31);
-
-    if (!data->seek_on) {
-        sprintf(str, "%.1f", data->tuner->freq / 1000.0);
-        str_2ws(&ws, str, 127);
-    } else {
-        wsprintf(&ws, "...");
+void UI_DrawBackground(const UI_DATA *data) {
+    if (IMAGES) {
+        DrawCroppedIMGHDR(0, YDISP, 0, YDISP + GLOBAL_OFFSET_Y, ScreenW(), ScreenH() - SoftkeyH(),
+            0, IMAGES[IMG_BG]);
     }
-    int font = FONT_MEDIUM;
-    int x, y, x2, y2, w, h;
-    // freq
-    x = UI_FREQ_X;
-    y = UI_FREQ_Y;
-    w = UI_FREQ_W;
-    h = GetFontYSIZE(font);
-    x2 = x + w;
-    y2 = y + h;
-    DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
-    DrawString(&ws, x, y, x2, y2, font, TEXT_ALIGNMIDDLE,
-        GetPaletteAdrByColorIndex(0), GetPaletteAdrByColorIndex(23));
-    //bm
-    x = UI_BM_X;
-    y = UI_BM_Y;
-    w = UI_BM_W;
-    h = GetFontYSIZE(font);
-    x2 = x + w;
-    y2 = y + h;
-    DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
-    if (data->bm >= 0) {
-        wsprintf(&ws, "%d", data->bm + 1);
+}
+
+void UI_DrawMainInfo(const UI_DATA *data) {
+    if (IMAGES) {
+        WSHDR ws;
+        char str[32];
+        uint16_t wsbody[32];
+        CreateLocalWS(&ws, wsbody, 31);
+
+        if (!data->seek_on) {
+            sprintf(str, "%.1f", data->csm->tuner.freq / 1000.0);
+            str_2ws(&ws, str, 127);
+        } else {
+            wsprintf(&ws, "...");
+        }
+        int font = FONT_MEDIUM;
+        int x, y, x2, y2, w, h;
+        // freq
+        x = UI_FREQ_X;
+        y = UI_FREQ_Y;
+        w = UI_FREQ_W;
+        h = GetFontYSIZE(font);
+        x2 = x + w;
+        y2 = y + h;
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
         DrawString(&ws, x, y, x2, y2, font, TEXT_ALIGNMIDDLE,
             GetPaletteAdrByColorIndex(0), GetPaletteAdrByColorIndex(23));
+        //bm
+        x = UI_BM_X;
+        y = UI_BM_Y;
+        w = UI_BM_W;
+        h = GetFontYSIZE(font);
+        x2 = x + w;
+        y2 = y + h;
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        if (data->bm >= 0) {
+            wsprintf(&ws, "%d", data->bm + 1);
+            DrawString(&ws, x, y, x2, y2, font, TEXT_ALIGNMIDDLE,
+                GetPaletteAdrByColorIndex(0), GetPaletteAdrByColorIndex(23));
+        }
     }
 }
 
 void UI_DrawArrowLeft(const UI_DATA *data) {
-    DrawIMGHDR(UI_ARROW_LEFT_X, UI_ARROW_LEFT_Y, data->images[IMG_ARROW_LEFT]);
+    if (IMAGES) {
+        DrawIMGHDR(UI_ARROW_LEFT_X, UI_ARROW_LEFT_Y, IMAGES[IMG_ARROW_LEFT]);
+    }
 }
 
 void UI_DrawArrowRight(const UI_DATA *data) {
-    DrawIMGHDR(UI_ARROW_RIGHT_X, UI_ARROW_RIGHT_Y, data->images[IMG_ARROW_RIGHT]);
+    if (IMAGES) {
+        DrawIMGHDR(UI_ARROW_RIGHT_X, UI_ARROW_RIGHT_Y, IMAGES[IMG_ARROW_RIGHT]);
+    }
 }
 
 void UI_DrawArrowUp(const UI_DATA *data) {
-    DrawIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, data->images[IMG_ARROW_UP]);
+    if (IMAGES) {
+        DrawIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, IMAGES[IMG_ARROW_UP]);
+    }
 }
 
 void UI_DrawArrowDown(const UI_DATA *data) {
-    DrawIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, data->images[IMG_ARROW_DOWN]);
+    if (IMAGES) {
+        DrawIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, IMAGES[IMG_ARROW_DOWN]);
+    }
 }
 
 void UI_ClearArrowUp(const UI_DATA *data) {
-    const int w = data->images[IMG_ARROW_UP]->w;
-    const int h = data->images[IMG_ARROW_UP]->h;
-    DrawCroppedIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, UI_ARROW_UP_X, UI_ARROW_UP_Y + GLOBAL_OFFSET_Y,
-        w, h, 0, data->images[IMG_BG]);
+    if (IMAGES) {
+        const int w = IMAGES[IMG_ARROW_UP]->w;
+        const int h = IMAGES[IMG_ARROW_UP]->h;
+        DrawCroppedIMGHDR(UI_ARROW_UP_X, UI_ARROW_UP_Y, UI_ARROW_UP_X, UI_ARROW_UP_Y + GLOBAL_OFFSET_Y,
+            w, h, 0, IMAGES[IMG_BG]);
+    }
 }
 
 void UI_ClearArrowDown(const UI_DATA *data) {
-    const int w = data->images[IMG_ARROW_DOWN]->w;
-    const int h = data->images[IMG_ARROW_DOWN]->h;
-    DrawCroppedIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y + GLOBAL_OFFSET_Y,
-        w, h, 0, data->images[IMG_BG]);
+    if (IMAGES) {
+        const int w = IMAGES[IMG_ARROW_DOWN]->w;
+        const int h = IMAGES[IMG_ARROW_DOWN]->h;
+        DrawCroppedIMGHDR(UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y, UI_ARROW_DOWN_X, UI_ARROW_DOWN_Y + GLOBAL_OFFSET_Y,
+            w, h, 0, IMAGES[IMG_BG]);
+    }
 }
 
 void UI_DrawVolume(const UI_DATA *data) {
-    const int x = UI_VOLUME_X;
-    const int y = UI_VOLUME_Y;
-    const int w = data->images[IMG_VOLUME]->w;
-    const int h = UI_VOLUME_H;
-    if (data->tuner->volume.volume) {
-        const int offset_y = h * (data->tuner->volume.volume - 1);
-        DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, data->images[IMG_VOLUME]);
-    } else {
-        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
-    }
-    if (data->tuner->volume.is_mute) {
-        DrawIMGHDR(UI_VOLUME_MUTE_X, UI_VOLUME_MUTE_Y, data->images[IMG_MUTE]);
+    if (IMAGES) {
+        const int x = UI_VOLUME_X;
+        const int y = UI_VOLUME_Y;
+        const int w = IMAGES[IMG_VOLUME]->w;
+        const int h = UI_VOLUME_H;
+        if (data->csm->tuner.volume.volume) {
+            const int offset_y = h * (data->csm->tuner.volume.volume - 1);
+            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, IMAGES[IMG_VOLUME]);
+        } else {
+            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        }
+        if (data->csm->tuner.volume.is_mute) {
+            DrawIMGHDR(UI_VOLUME_MUTE_X, UI_VOLUME_MUTE_Y, IMAGES[IMG_MUTE]);
+        }
     }
 }
 
 void UI_DrawLevel(const UI_DATA *data) {
-    const int x = UI_LEVEL_X;
-    const int y = UI_LEVEL_Y;
-    const int w = data->images[IMG_COVERAGE]->w;
-    const int h = UI_LEVEL_H;
-    if (data->tuner->level) {
-        const int offset_y = h * (data->tuner->level - 1);
-        DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, data->images[IMG_COVERAGE]);
-    } else {
-        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
+    if (IMAGES) {
+        const int x = UI_LEVEL_X;
+        const int y = UI_LEVEL_Y;
+        const int w = IMAGES[IMG_COVERAGE]->w;
+        const int h = UI_LEVEL_H;
+        if (data->csm->tuner.level) {
+            const int offset_y = h * (data->csm->tuner.level - 1);
+            DrawCroppedIMGHDR(x, y, 0, offset_y, w, h, 0, IMAGES[IMG_COVERAGE]);
+        } else {
+            DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        }
     }
 }
 
 void UI_DrawStereoStatus(const UI_DATA *data) {
-    int x = UI_STEREO_STATUS_X;
-    const int y = UI_STEREO_STATUS_Y;
-    const int w = UI_STEREO_STATUS_W;
-    const int h = UI_STEREO_STATUS_H;
-    DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
-    if (data->tuner->stereo_status > 0) {
-        DrawIMGHDR(x, y, data->images[IMG_STEREO]);
-    } else {
-        x += (w - data->images[IMG_MONO]->w) / 2;
-        DrawIMGHDR(x, y, data->images[IMG_MONO]);
+    if (IMAGES) {
+        int x = UI_STEREO_STATUS_X;
+        const int y = UI_STEREO_STATUS_Y;
+        const int w = UI_STEREO_STATUS_W;
+        const int h = UI_STEREO_STATUS_H;
+        DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, IMAGES[IMG_BG]);
+        if (data->csm->tuner.stereo_status > 0) {
+            DrawIMGHDR(x, y, IMAGES[IMG_STEREO]);
+        } else {
+            x += (w - IMAGES[IMG_MONO]->w) / 2;
+            DrawIMGHDR(x, y, IMAGES[IMG_MONO]);
+        }
     }
 }
 
@@ -145,8 +171,7 @@ static void UpdateInfo_Proc(void *gui) {
 static void OnRedraw(GUI *gui) {
     const UI_DATA *data = TViewGetUserPointer(gui);
 
-    DrawCroppedIMGHDR(0, YDISP, 0, YDISP + GLOBAL_OFFSET_Y, ScreenW(), ScreenH() - SoftkeyH(),
-        0, data->images[IMG_BG]);
+    UI_DrawBackground(data);
     UI_DrawMainInfo(data);
     UI_DrawVolume(data);
     UI_DrawLevel(data);
@@ -179,7 +204,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
     if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
         if (!data->seek_on) {
             if (submess == '*') {
-                if (Tuner_ToggleMute(data->tuner)) {
+                if (Tuner_ToggleMute(&(data->csm->tuner))) {
                     UI_DrawVolume(data);
                 }
             } else if (submess == UP_BUTTON) {
@@ -219,14 +244,14 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
         } else { // LONG_PRESS
             if (submess == LEFT_BUTTON) {
                 if (!lock_seek) {
-                    if (Tuner_Seek(data->tuner->freq, TUNER_SEEK_DOWN)) {
+                    if (Tuner_Seek(data->csm->tuner.freq, TUNER_SEEK_DOWN)) {
                         UI_DrawArrowLeft(data);
                         lock_seek = 1;
                     }
                 }
             } else if (submess == RIGHT_BUTTON) {
                 if (!lock_seek) {
-                    if (Tuner_Seek(data->tuner->freq, TUNER_SEEK_UP)) {
+                    if (Tuner_Seek(data->csm->tuner.freq, TUNER_SEEK_UP)) {
                         UI_DrawArrowRight(data);
                         lock_seek = 1;
                     }
@@ -236,9 +261,9 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
                     if (!lock_bm) {
                         char message[128];
                         const int id = submess - '0' - 1;
-                        data->bm = Bookmarks_Set(id, data->tuner->freq);
+                        data->bm = Bookmarks_Set(id, data->csm->tuner.freq);
                         if (data->bm >= 0) {
-                            sprintf(message, "Bookmark %d set to %d kHz", data->bm + 1, data->tuner->freq);
+                            sprintf(message, "Bookmark %d set to %d kHz", data->bm + 1, data->csm->tuner.freq);
                             ShowMSG(1, (int)message);
                         }
                         lock_bm = 1;
@@ -249,7 +274,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
     } else if (msg->gbsmsg->msg == KEY_UP) {
         if (submess == LEFT_BUTTON) {
             if (!lock_seek) {
-                if (Tuner_DecFreq(data->tuner)) {
+                if (Tuner_DecFreq(&data->csm->tuner)) {
                     UI_DrawMainInfo(data);
                     UI_DrawArrowLeft(data);
                     GUI_StartTimerProc(gui, data->tmr_redraw, 100, (void(*)(void*))DirectRedrawGUI);
@@ -257,7 +282,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
             }
         } else if (submess == RIGHT_BUTTON) {
             if (!lock_seek) {
-                if (Tuner_IncFreq(data->tuner)) {
+                if (Tuner_IncFreq(&data->csm->tuner)) {
                     UI_DrawMainInfo(data);
                     UI_DrawArrowRight(data);
                     GUI_StartTimerProc(gui, data->tmr_redraw, 100, (void(*)(void*))DirectRedrawGUI);
@@ -305,7 +330,6 @@ static void GHook(GUI *gui, int cmd) {
     } else if (cmd == UI_CMD_DESTROY) {
         GUI_DeleteTimer(gui, data->tmr_redraw);
         GUI_DeleteTimer(gui, data->tmr_update_info);
-        DestroyImages(&(data->images));
         mfree(data);
     }
 }
@@ -325,27 +349,19 @@ static TVIEW_DESC TVIEW_D = {
     0,
 };
 
-int UI_Create(TUNER *tuner) {
-    IMGHDR **images = LoadImages(UI_STYLE_WHITE);
-    if (images) {
-        memcpy(&(HEADER_D.rc), GetHeaderRECT(), sizeof(RECT));
-        memcpy(&(TVIEW_D.rc), GetMainAreaRECT(), sizeof(RECT));
+int UI_Create(MAIN_CSM *csm) {
+    memcpy(&(HEADER_D.rc), GetHeaderRECT(), sizeof(RECT));
+    memcpy(&(TVIEW_D.rc), GetMainAreaRECT(), sizeof(RECT));
 
-        UI_DATA *data = malloc(sizeof(UI_DATA));
-        zeromem(data, sizeof(UI_DATA));
-        data->tuner = tuner;
-        data->images = images;
+    UI_DATA *data = malloc(sizeof(UI_DATA));
+    zeromem(data, sizeof(UI_DATA));
+    data->csm = csm;
 
-        WSHDR *ws = AllocWS(1);
-        void *gui = TViewGetGUI(malloc_adr(), mfree_adr());
-        TViewSetDefinition(gui, &TVIEW_D);
-        TViewSetText(gui, ws, malloc_adr(), mfree_adr());
-        TViewSetUserPointer(gui, data);
-        SetHeader(gui, &HEADER_D, malloc_adr());
-
-        return CreateGUI(gui);
-    } else {
-        MsgBoxError(1, (int)"Failed to load images");
-    }
-    return -1;
+    WSHDR *ws = AllocWS(1);
+    void *gui = TViewGetGUI(malloc_adr(), mfree_adr());
+    TViewSetDefinition(gui, &TVIEW_D);
+    TViewSetText(gui, ws, malloc_adr(), mfree_adr());
+    TViewSetUserPointer(gui, data);
+    SetHeader(gui, &HEADER_D, malloc_adr());
+    return CreateGUI(gui);
 }

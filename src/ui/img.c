@@ -1,9 +1,10 @@
+#include <swilib.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <swilib.h>
 #include "ui.h"
+#include "../ipc.h"
 
-void DestroyImages(IMGHDR ***images);
+IMGHDR **IMAGES = NULL;
 
 #define GetImgPath(filename) "2:\\japp\\fmradio\\fmradio\\images\\" filename
 
@@ -20,29 +21,31 @@ const char *FILE_NAMES[IMG_COUNT] = {
     "_Stereo.png"
 };
 
-void GetFileName(char *path, UI_IMG img, UI_STYLE style) {
+void GetFileName(char *path, UI_IMG img, UI_THEME theme) {
     const char *dir = "2:\\japp\\fmradio\\fmradio\\images";
-    sprintf(path, "%s\\%s%s", dir, (style == UI_STYLE_WHITE) ? "W" : "B", FILE_NAMES[img]);
+    sprintf(path, "%s\\%s%s", dir, (theme == UI_THEME_WHITE) ? "W" : "B", FILE_NAMES[img]);
 }
 
-IMGHDR **LoadImages(UI_STYLE style) {
+void UI_LoadImages(UI_THEME theme) {
+    IPC_SendMessage(IPC_LOAD_IMAGES_START, NULL);
     char path[256];
     const size_t size = sizeof(IMGHDR*) * IMG_COUNT;
-    IMGHDR **images = malloc(size);
-    zeromem(images, (int)size);
-
-    IMGHDR *img = NULL;
+    IMGHDR **imgs = malloc(size);
+    zeromem(imgs, (int)size);
     for (int i = 0; i <IMG_COUNT; i++) {
-        GetFileName(path, i, style);
-        img = CreateIMGHDRFromPngFile(path, 0);
+        GetFileName(path, i, theme);
+        IMGHDR *img = CreateIMGHDRFromPngFile(path, 0);
         if (img) {
-            images[i] = img;
+            imgs[i] = img;
         } else {
-            DestroyImages(&images);
-            return NULL;
+            UI_DestroyImages(&imgs);
+            imgs = NULL;
         }
     }
-    return images;
+    if (imgs) {
+        IMAGES = imgs;
+    }
+    IPC_SendMessage(IPC_LOAD_IMAGES_END, imgs);
 }
 
 void DestroyIMGHDR(IMGHDR **img) {
@@ -53,9 +56,10 @@ void DestroyIMGHDR(IMGHDR **img) {
     }
 }
 
-void DestroyImages(IMGHDR ***images) {
-    for (int i = 0; i < IMG_COUNT; i++) {
-        DestroyIMGHDR(&(*images)[i]);
+void UI_DestroyImages(IMGHDR ***images) {
+    if (*images) {
+        for (int i = 0; i < IMG_COUNT; i++) {
+            DestroyIMGHDR(&(*images)[i]);
+        }
     }
-    *images = NULL;
 }

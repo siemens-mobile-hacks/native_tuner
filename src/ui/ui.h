@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../tuner.h"
-
-typedef enum {
-    UI_STYLE_WHITE,
-    UI_STYLE_BLACK,
-} UI_STYLE;
+#include "img.h"
+#include "../csm.h"
 
 typedef enum {
     IMG_BG,
@@ -21,22 +17,15 @@ typedef enum {
     IMG_COUNT,
 } UI_IMG;
 
-typedef enum {
-    UI_STATUS_PAUSE,
-    UI_STATUS_SEEK,
-} UI_STATUS;
-
 typedef struct {
-    TUNER *tuner;
-    IMGHDR **images;
+    MAIN_CSM *csm;
     int bm;
-    int pause;
     int seek_on;
     int tmr_redraw;
     int tmr_update_info;
 } UI_DATA;
 
-int UI_Create(TUNER *tuner);
+int UI_Create(MAIN_CSM *csm);
 
 void UI_DrawMainInfo(const UI_DATA *data);
 void UI_DrawVolume(const UI_DATA *data);
