@@ -16,6 +16,8 @@ typedef enum {
     IMG_COVERAGE,
     IMG_ARROW_UP,
     IMG_ARROW_DOWN,
+    IMG_MONO,
+    IMG_STEREO,
     IMG_COUNT,
 } UI_IMG;
 
@@ -31,7 +33,7 @@ typedef struct {
     int pause;
     int seek_on;
     int tmr_redraw;
-    int tmr_set_level;
+    int tmr_update_info;
 } UI_DATA;
 
 int UI_Create(TUNER *tuner);
@@ -39,3 +41,4 @@ int UI_Create(TUNER *tuner);
 void UI_DrawMainInfo(const UI_DATA *data);
 void UI_DrawVolume(const UI_DATA *data);
 void UI_DrawLevel(const UI_DATA *data);
+void UI_DrawStereoStatus(const UI_DATA *data);

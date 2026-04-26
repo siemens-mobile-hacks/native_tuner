@@ -32,3 +32,8 @@
 #define UI_LEVEL_X 23
 #define UI_LEVEL_Y 153
 #define UI_LEVEL_H 35
+//stereo status
+#define UI_STEREO_STATUS_X 137
+#define UI_STEREO_STATUS_Y 125
+#define UI_STEREO_STATUS_W 25
+#define UI_STEREO_STATUS_H 7

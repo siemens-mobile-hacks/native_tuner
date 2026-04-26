@@ -16,6 +16,8 @@ const char *FILE_NAMES[IMG_COUNT] = {
     "_Coverage.png",
     "_Arrow_up.png",
     "_Arrow_down.png",
+    "_Mono.png",
+    "_Stereo.png"
 };
 
 void GetFileName(char *path, UI_IMG img, UI_STYLE style) {

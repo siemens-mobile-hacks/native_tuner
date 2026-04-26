@@ -5,8 +5,8 @@
 #include "ui.h"
 #include "img.h"
 #include "layout.h"
+#include "../ipc.h"
 #include "../bookmarks.h"
-#include "../functions.h"
 
 #define LGP_PAUSE_PIC (LGP_STOP_PIC - 1)
 
@@ -122,10 +122,24 @@ void UI_DrawLevel(const UI_DATA *data) {
     }
 }
 
-static void SetCurrentLevel_Proc(void *gui) {
+void UI_DrawStereoStatus(const UI_DATA *data) {
+    int x = UI_STEREO_STATUS_X;
+    const int y = UI_STEREO_STATUS_Y;
+    const int w = UI_STEREO_STATUS_W;
+    const int h = UI_STEREO_STATUS_H;
+    DrawCroppedIMGHDR(x, y, x, y + GLOBAL_OFFSET_Y, w, h, 0, data->images[IMG_BG]);
+    if (data->tuner->stereo_status > 0) {
+        DrawIMGHDR(x, y, data->images[IMG_STEREO]);
+    } else {
+        x += (w - data->images[IMG_MONO]->w) / 2;
+        DrawIMGHDR(x, y, data->images[IMG_MONO]);
+    }
+}
+
+static void UpdateInfo_Proc(void *gui) {
     const UI_DATA *data = TViewGetUserPointer(gui);
-    Tuner_SetCurrentLevel();
-    GUI_StartTimerProc(gui, data->tmr_set_level, 500, SetCurrentLevel_Proc);
+    IPC_SendMessage(IPC_TUNER_UPDATE_INFO, NULL);
+    GUI_StartTimerProc(gui, data->tmr_update_info, 500, UpdateInfo_Proc);
 }
 
 static void OnRedraw(GUI *gui) {
@@ -136,6 +150,7 @@ static void OnRedraw(GUI *gui) {
     UI_DrawMainInfo(data);
     UI_DrawVolume(data);
     UI_DrawLevel(data);
+    UI_DrawStereoStatus(data);
 
     const TVIEW_DESC *tview = gui->definition;
     if (tview->global_hook_proc) {
@@ -280,16 +295,16 @@ static void GHook(GUI *gui, int cmd) {
         gui->methods = &methods;
         UnlockSched();
         data->tmr_redraw = GUI_NewTimer(gui);
-        data->tmr_set_level = GUI_NewTimer(gui);
+        data->tmr_update_info = GUI_NewTimer(gui);
     } else if (cmd == UI_CMD_FOCUS) {
         DisableIDLETMR();
-        SetCurrentLevel_Proc(gui);
+        UpdateInfo_Proc(gui);
     } else if (cmd == UI_CMD_UNFOCUS) {
         GUI_DeleteTimer(gui, data->tmr_redraw);
-        GUI_DeleteTimer(gui, data->tmr_set_level);
+        GUI_DeleteTimer(gui, data->tmr_update_info);
     } else if (cmd == UI_CMD_DESTROY) {
         GUI_DeleteTimer(gui, data->tmr_redraw);
-        GUI_DeleteTimer(gui, data->tmr_set_level);
+        GUI_DeleteTimer(gui, data->tmr_update_info);
         DestroyImages(&(data->images));
         mfree(data);
     }

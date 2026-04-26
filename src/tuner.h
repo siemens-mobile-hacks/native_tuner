@@ -23,6 +23,7 @@ typedef struct {
     uint32_t freq;
     TUNER_VOLUME volume;
     int level;
+    int stereo_status;
 } TUNER;
 
 int Tuner_Init(TUNER *tuner);
@@ -37,5 +38,7 @@ int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction);
 int Tuner_SetVolume(TUNER *tuner, int volume);
 int Tuner_DecVolume(TUNER *tuner);
 int Tuner_IncVolume(TUNER *tuner);
-int Tuner_ToggleMute(TUNER *tuner);;
+int Tuner_ToggleMute(TUNER *tuner);
 void Tuner_SetCurrentLevel();
+void Tuner_SetStereoStatus();
+

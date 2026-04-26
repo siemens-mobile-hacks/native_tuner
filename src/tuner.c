@@ -5,7 +5,6 @@
 
 static void CB_SetFreq() {
     IPC_SendMessage(IPC_TUNER_SET_FREQ, NULL);
-    Tuner_SetCurrentLevel();
 }
 
 static void CB_AutoSearch(int state, uint32_t freq) {
@@ -14,8 +13,14 @@ static void CB_AutoSearch(int state, uint32_t freq) {
 }
 
 static void CB_GetCurrentLevel(int state, const uint8_t *level) {
-    if (((state == 1) || (state == 2)) && level != 0) {
-        IPC_SendMessage(IPC_TUNER_SET_LEVEL, (void*)*(int*)level);
+    if ((state == 1 || state == 2) && level) {
+        IPC_SendMessage(IPC_TUNER_SET_CURRENT_LEVEL, (void*)*(int*)level);
+    }
+}
+
+static void CB_GetStereoStatus(int state, const uint8_t *stereo) {
+    if ((state == 1 || state == 2) && stereo) {
+        IPC_SendMessage(IPC_TUNER_SET_STEREO_STATUS, (void*)*(int*)stereo);
     }
 }
 
@@ -167,4 +172,8 @@ int Tuner_ToggleMute(TUNER *tuner) {
 
 void Tuner_SetCurrentLevel() {
     fmdl_get_current_level(CB_GetCurrentLevel);
+}
+
+void Tuner_SetStereoStatus() {
+    fmdl_get_stereo_status(CB_GetStereoStatus);
 }

@@ -1,20 +1,21 @@
 #include <swilib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "bookmarks.h"
 #include "ipc.h"
 #include "tuner.h"
 #include "config.h"
 #include "keyhook.h"
-#include "functions.h"
+#include "bookmarks.h"
 #include "ui/ui.h"
+
+#define CSM_STATE_UPDATE_INFO 0xA
 
 typedef struct {
     CSM_RAM csm;
     TUNER tuner;
     int gui_id;
 
+    GBSTMR tmr_set_stereo_status;
     uint32_t freq_tmp;
 } MAIN_CSM;
 
@@ -39,6 +40,7 @@ static void OnCreate(CSM_RAM *data) {
 
 static void OnClose(CSM_RAM *data) {
     MAIN_CSM *csm = (MAIN_CSM*)data;
+    GBS_DelTimer(&csm->tmr_set_stereo_status);
     Tuner_Destroy(&csm->tuner);
     KeyHook_Destroy();
     SUBPROC(kill_elf);
@@ -71,6 +73,9 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                         UI_DrawMainInfo(ui_data);
                     }
                 }
+                csm->tuner.level = 0;
+                // csm->tuner.stereo_status = 0;
+                csm->csm.state = CSM_STATE_UPDATE_INFO;
             } else if (msg->submess == IPC_TUNER_START_SEEK) {
                 UI_DATA *ui_data = GetUIData(csm);
                 if (ui_data) {
@@ -86,7 +91,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                     ui_data->seek_on = 0;
                     DirectRedrawGUI_ID(csm->gui_id);
                 }
-            } else if (msg->submess == IPC_TUNER_SET_LEVEL) {
+            } else if (msg->submess == IPC_TUNER_SET_CURRENT_LEVEL) {
                 const UI_DATA *ui_data = GetUIData(csm);
                 csm->tuner.level = (int)ipc->data;
                 if (ui_data) {
@@ -94,6 +99,16 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                         UI_DrawLevel(ui_data);
                     }
                 }
+            } else if (msg->submess == IPC_TUNER_SET_STEREO_STATUS) {
+                const UI_DATA *ui_data = GetUIData(csm);
+                csm->tuner.stereo_status = (int)ipc->data;
+                if (ui_data) {
+                    if (IsGuiOnTop(csm->gui_id)) {
+                        UI_DrawStereoStatus(ui_data);
+                    }
+                }
+            } else if (msg->submess == IPC_TUNER_UPDATE_INFO) {
+                csm->csm.state = CSM_STATE_UPDATE_INFO;
             } else if (msg->submess == IPC_VOL_UP || msg->submess == IPC_VOL_DOWN) {
                 const UI_DATA *ui_data = GetUIData(csm);
                 const int success = (msg->submess == IPC_VOL_UP) ? Tuner_IncVolume(&csm->tuner) : Tuner_DecVolume(&csm->tuner);
@@ -112,6 +127,11 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
             Config_Init();
             ShowMSG(1, (int)"NativeTuner config updated!");
         }
+    }
+    if (csm->csm.state == CSM_STATE_UPDATE_INFO) {
+        Tuner_SetCurrentLevel();
+        GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_SetStereoStatus);
+        csm->csm.state = 0;
     }
     return 1;
 }
