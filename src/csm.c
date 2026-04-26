@@ -41,6 +41,7 @@ static void OnClose(CSM_RAM *data) {
     }
     GBS_DelTimer(&csm->tmr_set_stereo_status);
     Tuner_Destroy(&csm->tuner);
+    Config_Save();
     SUBPROC(DestroyBackground);
 }
 
