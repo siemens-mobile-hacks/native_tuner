@@ -24,7 +24,6 @@ unsigned short maincsm_name_body[140];
 
 static void OnCreate(CSM_RAM *data) {
     MAIN_CSM *csm = (MAIN_CSM*)data;
-
     if (!Tuner_Init(&csm->tuner)) {
         csm->csm.state = CSM_STATE_CLOSED;
         return;
@@ -169,11 +168,15 @@ void UpdateCSMname(void) {
 }
 
 int main() {
-    MAIN_CSM main_csm = { 0 };
-    Config_Init();
-    LockSched();
-    UpdateCSMname();
-    CreateCSM(&MAINCSM.maincsm, &main_csm, 0);
-    UnlockSched();
+    if (!Tuner_GetPowerState()) {
+        MAIN_CSM main_csm = { 0 };
+        Config_Init();
+        LockSched();
+        UpdateCSMname();
+        CreateCSM(&MAINCSM.maincsm, &main_csm, 0);
+        UnlockSched();
+    } else {
+        MsgBoxError(1, (int)"Radio already in use");
+    }
     return 0;
 }

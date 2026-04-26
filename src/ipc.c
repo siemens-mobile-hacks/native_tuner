@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include "ipc.h"
 
 const char *IPC_NAME = "NativeTuner";
 
