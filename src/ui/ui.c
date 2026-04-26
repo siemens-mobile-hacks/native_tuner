@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "ui.h"
 #include "layout.h"
+#include "menu_options.h"
 #include "../ipc.h"
 #include "../bookmarks.h"
 
@@ -14,7 +15,7 @@ HEADER_DESC HEADER_D = {{0, 0, 0, 0}, NULL, (int)"", LGP_NULL};
 const int SOFTKEYS[] = {SET_LEFT_SOFTKEY, SET_MIDDLE_SOFTKEY, SET_RIGHT_SOFTKEY};
 
 static SOFTKEY_DESC SOFTKEY_D[] = {
-    {0x0018, 0x0000, (int)""},
+    {0x0018, 0x0000, (int)"Options"},
     {0x003D, 0x0000, (int)LGP_PAUSE_PIC},
     {0x0001, 0x0000, (int)"Exit"},
 };
@@ -192,7 +193,10 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
     UI_DATA *data = TViewGetUserPointer(gui);
 
     const int submess = msg->gbsmsg->submess;
-    if (msg->keys == 0x3D) {
+    if (msg->keys == 0x18) {
+        MenuOptions_Create(gui);
+        return -1;
+    } else if (msg->keys == 0x3D) {
         Tuner_SetPower(!Tuner_GetPowerState());
         DirectRedrawGUI();
         return -1;

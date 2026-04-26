@@ -27,7 +27,7 @@ void GetFileName(char *path, UI_IMG img, UI_THEME theme) {
 }
 
 void UI_LoadImages(UI_THEME theme) {
-    IPC_SendMessage(IPC_LOAD_IMAGES_START, NULL);
+    IPC_SendMessage(IPC_LOAD_IMAGES_START, (void*)theme);
     char path[256];
     const size_t size = sizeof(IMGHDR*) * IMG_COUNT;
     IMGHDR **imgs = malloc(size);
@@ -39,10 +39,11 @@ void UI_LoadImages(UI_THEME theme) {
             imgs[i] = img;
         } else {
             UI_DestroyImages(&imgs);
-            imgs = NULL;
+            break;
         }
     }
     if (imgs) {
+        UI_DestroyImages(&IMAGES);
         IMAGES = imgs;
     }
     IPC_SendMessage(IPC_LOAD_IMAGES_END, imgs);
@@ -61,5 +62,7 @@ void UI_DestroyImages(IMGHDR ***images) {
         for (int i = 0; i < IMG_COUNT; i++) {
             DestroyIMGHDR(&(*images)[i]);
         }
+        mfree(*images);
+        *images = NULL;
     }
 }

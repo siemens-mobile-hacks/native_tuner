@@ -63,6 +63,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
         IPC_REQ *ipc = msg->data0;
         if (strcmpi(ipc->name_to, IPC_NAME) == 0) {
             if (msg->submess == IPC_LOAD_IMAGES_START) {
+                csm->theme.temp = (int)ipc->data;
                 if (!csm->please_wait_gui_id) {
                     csm->please_wait_gui_id = ShowPleaseWaitBox(1);
                 }
@@ -74,8 +75,9 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                 IMGHDR **images = ipc->data;
                 if (images) {
                     IMAGES = images;
+                    csm->theme.current = csm->theme.temp;
                 } else {
-                    MsgBoxError(1, (int)"Failed to load images");
+                    MsgBoxError(0x11, (int)"Failed to load images");
                     if (!IMAGES) {
                         csm->csm.state = CSM_STATE_CLOSED;
                     }
@@ -143,6 +145,10 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     } else if (msg->msg == MSG_RECONFIGURE_REQ) {
         if (strcmp(CFG_PATH, msg->data0) == 0) {
             Config_Init();
+            UI_DATA *ui_data = GetUIData(csm);
+            if (ui_data) {
+                ui_data->bm = Bookmarks_Find(csm->tuner.freq);
+            }
             ShowMSG(1, (int)"NativeTuner config updated!");
         }
     }
