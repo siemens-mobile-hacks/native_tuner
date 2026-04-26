@@ -58,7 +58,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
         Obs_Mam_SetPurpose(csm->tuner.hobj, 0x21);
         Obs_Start(csm->tuner.hobj);
     } else if (msg->msg == MSG_IPC) {
-        const IPC_REQ *ipc = msg->data0;
+        IPC_REQ *ipc = msg->data0;
         if (strcmpi(ipc->name_to, IPC_NAME) == 0) {
             if (msg->submess == IPC_TUNER_SET_FREQ_TMP) {
                 csm->freq_tmp = (uint32_t)ipc->data;
@@ -105,6 +105,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                     }
                 }
             }
+            IPC_DestroyMessage(ipc);
         }
     } else if (msg->msg == MSG_RECONFIGURE_REQ) {
         if (strcmp(CFG_PATH, msg->data0) == 0) {

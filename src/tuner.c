@@ -7,22 +7,18 @@
 #include "functions.h"
 
 static void CB_SetFreq() {
-    static IPC_REQ ipc_req;
-    IPC_Send(&ipc_req, IPC_TUNER_SET_FREQ);
+    IPC_SendMessage(IPC_TUNER_SET_FREQ, NULL);
     Tuner_SetCurrentLevel();
 }
 
 static void CB_AutoSearch(int state, uint32_t freq) {
     Tuner_SetFreq(freq);
-    static IPC_REQ ipc_req;
-    IPC_Send(&ipc_req, IPC_TUNER_STOP_SEEK);
+    IPC_SendMessage(IPC_TUNER_STOP_SEEK, NULL);
 }
 
 static void CB_GetCurrentLevel(int state, const uint8_t *level) {
     if (((state == 1) || (state == 2)) && level != 0) {
-        static IPC_REQ ipc_req;
-        ipc_req.data = (void*)(*(int*)level);
-        IPC_Send(&ipc_req, IPC_TUNER_SET_LEVEL);
+        IPC_SendMessage(IPC_TUNER_SET_LEVEL, (void*)*(int*)level);
     }
 }
 
@@ -72,9 +68,7 @@ int Tuner_SetFreq(uint32_t freq) {
     }
     int unk = 0;
     if (fmdl_set_freq(freq, &unk, CB_SetFreq) == 1) {
-        static IPC_REQ ipc_req;
-        ipc_req.data = (void*)freq;
-        IPC_Send(&ipc_req, IPC_TUNER_SET_FREQ_TMP);
+        IPC_SendMessage(IPC_TUNER_SET_FREQ_TMP, (void*)freq);
         success = 1;
     }
     return success;
@@ -109,8 +103,7 @@ int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction) {
     }
     int dir = direction;
     if (fmdl_auto_search(start_freq, &dir, CB_AutoSearch) == 1) {
-        static IPC_REQ ipc_req;
-        IPC_Send(&ipc_req, IPC_TUNER_START_SEEK);
+        IPC_SendMessage(IPC_TUNER_START_SEEK, NULL);
         success = 1;
     }
     return success;

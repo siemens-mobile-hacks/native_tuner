@@ -4,12 +4,10 @@
 int KeyHook(int submess, int msg) {
     if (msg == KEY_DOWN || msg == LONG_PRESS) {
         if (submess == VOL_UP_BUTTON) {
-            static IPC_REQ ipc;
-            IPC_Send(&ipc, IPC_VOL_UP);
+            IPC_SendMessage(IPC_VOL_UP, NULL);
             return KEYHOOK_BREAK;
         } else if (submess == VOL_DOWN_BUTTON) {
-            static IPC_REQ ipc;
-            IPC_Send(&ipc, IPC_VOL_DOWN);
+            IPC_SendMessage(IPC_VOL_DOWN, NULL);
             return KEYHOOK_BREAK;
         }
     }

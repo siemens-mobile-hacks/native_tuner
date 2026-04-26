@@ -13,6 +13,7 @@ enum {
     IPC_VOL_DOWN,
 };
 
-void IPC_Send(IPC_REQ *ipc, int submess);
+void IPC_SendMessage(int submess, void *data);
+void IPC_DestroyMessage(IPC_REQ *ipc);
 
 extern const char *IPC_NAME;
