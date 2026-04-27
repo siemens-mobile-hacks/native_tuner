@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ui_theme.h"
 #include "../csm.h"
+#include "ui_theme.h"
 
 typedef enum {
     IMG_BG,
@@ -19,7 +19,6 @@ typedef enum {
 
 typedef struct {
     MAIN_CSM *csm;
-    UI_THEME_TYPE theme_type;
     int bm;
     int seek_on;
     int tmr_redraw;

@@ -15,7 +15,7 @@ unsigned short maincsm_name_body[140];
 
 static void InitBackground() {
     KeyHook_Init();
-    UI_LoadTheme(UI_THEME_TYPE_WHITE);
+    UI_LoadTheme(CFG.theme_type);
 }
 
 static void DestroyBackground() {
@@ -41,7 +41,7 @@ static void OnClose(CSM_RAM *data) {
     }
     GBS_DelTimer(&csm->tmr_set_stereo_status);
     Tuner_Destroy(&csm->tuner);
-    Config_Save();
+    Config_Save(csm);
     SUBPROC(DestroyBackground);
 }
 
@@ -68,7 +68,6 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                     csm->please_wait_gui_id = ShowPleaseWaitBox(1);
                 }
             } else if (msg->submess == IPC_LOAD_THEME_END) {
-                UI_DATA *ui_data = GetUIData(csm);
                 if (csm->please_wait_gui_id) {
                     GeneralFunc_flag1(csm->please_wait_gui_id, 1);
                     csm->please_wait_gui_id = 0;
@@ -76,9 +75,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                 IMGHDR **images = ipc->data;
                 if (images) {
                     THEME.images = images;
-                    if (ui_data) {
-                        ui_data->theme_type = csm->temp.theme_type;
-                    }
+                    csm->theme_type = csm->temp.theme_type;
                 } else {
                     MsgBoxError(0x11, (int)"Failed to load images");
                     if (!THEME.images) {
@@ -151,6 +148,9 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
             UI_DATA *ui_data = GetUIData(csm);
             if (ui_data) {
                 ui_data->bm = Bookmarks_Find(csm->tuner.freq);
+            }
+            if (csm->theme_type != CFG.theme_type) {
+                SUBPROC(UI_LoadTheme, CFG.theme_type);
             }
             ShowMSG(1, (int)"NativeTuner config updated!");
         }

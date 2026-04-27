@@ -12,6 +12,7 @@ typedef struct {
 typedef struct {
     CSM_RAM csm;
     TUNER tuner;
+    UI_THEME_TYPE theme_type;
     int gui_id;
     int please_wait_gui_id;
     GBSTMR tmr_set_stereo_status;

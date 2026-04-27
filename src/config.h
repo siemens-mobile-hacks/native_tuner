@@ -1,9 +1,13 @@
 #pragma once
 
 #include <cfg_items.h>
+#include "csm.h"
 
 #pragma pack(push, 1)
 typedef struct {
+    const CFG_HDR cfghdr_0;
+    unsigned int theme_type;
+    const CFG_CBOX_ITEM cfgcbox_0[2];
     const CFG_HDR cfghdr_b_b;
     const CFG_HDR cfghdr_b_0;
     unsigned int bm0;
@@ -31,4 +35,4 @@ extern CONFIG CFG;
 extern char CFG_PATH[];
 
 void Config_Init();
-int Config_Save();
+int Config_Save(MAIN_CSM *csm);
