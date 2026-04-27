@@ -216,7 +216,7 @@ static const struct {
 
 void CSM_UpdateName(MAIN_CSM *csm) {
     WSHDR *ws = (WSHDR *)&MAINCSM.maincsm_name;
-    wsprintf(ws, "%c %s", (Tuner_GetPowerState() == 1) ? 0xE450 : 0xE44F, "Radio");
+    wsprintf(ws, "%c %s", (Tuner_GetPowerState() == 1) ? 0xE450 : 0xE44F, "FM");
     if (csm && csm->tuner.freq) {
         char s_freq[32];
         FreqToStr(s_freq, csm->tuner.freq, 1);
