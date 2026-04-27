@@ -7,7 +7,7 @@ int main() {
     if (!Tuner_GetPowerState()) {
         Config_Init();
         LockSched();
-        CSM_UpdateName();
+        CSM_UpdateName(NULL);
         CSM_Create();
         UnlockSched();
     } else {

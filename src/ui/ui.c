@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "ui.h"
 #include "layout.h"
 #include "menu_options.h"
 #include "../ipc.h"
+#include "../common.h"
 #include "../bookmarks.h"
+#include "ui.h"
 
 #define LGP_PAUSE_PIC (LGP_STOP_PIC - 1)
 
@@ -34,12 +35,12 @@ void UI_DrawBackground(const UI_DATA *data) {
 void UI_DrawMainInfo(const UI_DATA *data) {
     if (THEME.images) {
         WSHDR ws;
-        char str[32];
         uint16_t wsbody[32];
         CreateLocalWS(&ws, wsbody, 31);
 
         if (!data->seek_on) {
-            sprintf(str, "%.1f", data->csm->tuner.freq / 1000.0);
+            char str[32];
+            FreqToStr(str, data->csm->tuner.freq, 0);
             str_2ws(&ws, str, 127);
         } else {
             wsprintf(&ws, "...");

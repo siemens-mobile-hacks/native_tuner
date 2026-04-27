@@ -20,4 +20,4 @@ typedef struct {
 } MAIN_CSM;
 
 int CSM_Create();
-void CSM_UpdateName();
+void CSM_UpdateName(MAIN_CSM *csm);

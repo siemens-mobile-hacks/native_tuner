@@ -1,6 +1,8 @@
 #include <swilib.h>
+#include <stdio.h>
 #include <string.h>
 #include "ipc.h"
+#include "common.h"
 #include "config.h"
 #include "keyhook.h"
 #include "bookmarks.h"
@@ -96,6 +98,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                 csm->tuner.level = 0;
                 // csm->tuner.stereo_status = 0;
                 csm->csm.state = CSM_STATE_UPDATE_INFO;
+                CSM_UpdateName(csm);
             } else if (msg->submess == IPC_TUNER_SEEK_START) {
                 UI_DATA *ui_data = GetUIData(csm);
                 if (ui_data) {
@@ -191,8 +194,14 @@ static const struct {
     }
 };
 
-void CSM_UpdateName() {
-    wsprintf((WSHDR *)&MAINCSM.maincsm_name, "%s", "Radio");
+void CSM_UpdateName(MAIN_CSM *csm) {
+    WSHDR *ws = (WSHDR *)&MAINCSM.maincsm_name;
+    wsprintf(ws, "%s", "Radio");
+    if (csm && csm->tuner.freq) {
+        char s_freq[32];
+        FreqToStr(s_freq, csm->tuner.freq, 1);
+        wstrcatprintf(ws, " - %s", s_freq);
+    }
 }
 
 int CSM_Create() {
