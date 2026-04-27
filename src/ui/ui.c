@@ -198,8 +198,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
         MenuOptions_Create(gui);
         return -1;
     } else if (msg->keys == 0x3D) {
-        Tuner_SetPower(!Tuner_GetPowerState());
-        DirectRedrawGUI();
+        IPC_SendMessage(IPC_TUNER_SET_POWER, (void*)!Tuner_GetPowerState());
         return -1;
     } else if (msg->keys == 0x01) {
         return 1;

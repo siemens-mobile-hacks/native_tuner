@@ -99,6 +99,11 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
                         csm->csm.state = CSM_STATE_CLOSED;
                     }
                 }
+            } else if (msg->submess == IPC_TUNER_SET_POWER) {
+                const int power = (int)ipc->data;
+                Tuner_SetPower(power);
+                CSM_UpdateName(csm);
+                DirectRedrawGUI_ID(csm->gui_id);
             } else if (msg->submess == IPC_TUNER_SET_FREQ_TEMP) {
                 csm->temp.freq = (uint32_t)ipc->data;
             } else if (msg->submess == IPC_TUNER_SET_FREQ) {
@@ -211,11 +216,11 @@ static const struct {
 
 void CSM_UpdateName(MAIN_CSM *csm) {
     WSHDR *ws = (WSHDR *)&MAINCSM.maincsm_name;
-    wsprintf(ws, "%s", "Radio");
+    wsprintf(ws, "%c %s", (Tuner_GetPowerState() == 1) ? 0xE450 : 0xE44F, "Radio");
     if (csm && csm->tuner.freq) {
         char s_freq[32];
         FreqToStr(s_freq, csm->tuner.freq, 1);
-        wstrcatprintf(ws, " - %s", s_freq);
+        wstrcatprintf(ws, " %s", s_freq);
     }
 }
 
