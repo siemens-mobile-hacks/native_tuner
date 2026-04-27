@@ -52,15 +52,30 @@ static UI_DATA *GetUIData(const MAIN_CSM *csm) {
     return (gui) ? TViewGetUserPointer(gui) : NULL;
 }
 
+static void Obs_Prepare_Handler(HObj hobj) {
+    Obs_Sound_SetPurpose(hobj, 0x21);
+    Obs_Mam_SetPurpose(hobj, 0x21);
+    Obs_Start(hobj);
+}
+
+static void Obs_2_Handler() {
+    Tuner_SetFreq(104200);
+}
+
+static OBSevent OBSeventHandlers[] = {
+    {0x2, Obs_2_Handler},
+    {OBS_EV_PrepareCon, Obs_Prepare_Handler},
+    {OBS_EV_EndList, NULL},
+};
+
 static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     MAIN_CSM *csm = (MAIN_CSM*)data;
     if ((msg->msg == MSG_GUI_DESTROYED) && ((int)msg->data0 == csm->gui_id)) {
         csm->csm.state = CSM_STATE_CLOSED;
     } else if (msg->msg == TUNER_MSG_OBS) {
-        Obs_Sound_SetPurpose(csm->tuner.hobj, 0x21);
-        Obs_Mam_SetPurpose(csm->tuner.hobj, 0x21);
-        Obs_Start(csm->tuner.hobj);
-        Tuner_SetFreq(104200);
+        if (csm->tuner.hobj && csm->tuner.hobj == (HObj)msg->data0) {
+            Obs_TranslateMessageGBS(msg, OBSeventHandlers);
+        }
     } else if (msg->msg == MSG_IPC) {
         IPC_REQ *ipc = msg->data0;
         if (strcmpi(ipc->name_to, IPC_NAME) == 0) {
