@@ -160,11 +160,13 @@ int Tuner_IncVolume(TUNER *tuner) {
 
 int Tuner_ToggleMute(TUNER *tuner) {
     int success = 0;
-    const int volume = (!tuner->volume.is_mute) ? 0 : tuner->volume.obs_volume;
-    const int status = Obs_Sound_SetVolumeEx(tuner->hobj, volume, 1);
-    if (status == 0 || status == 0x8006) {
-        tuner->volume.is_mute = !tuner->volume.is_mute;
-        success = 1;
+    if (Tuner_GetPowerState() == 1) {
+        const int volume = (!tuner->volume.is_mute) ? 0 : tuner->volume.obs_volume;
+        const int status = Obs_Sound_SetVolumeEx(tuner->hobj, volume, 1);
+        if (status == 0 || status == 0x8006) {
+            tuner->volume.is_mute = !tuner->volume.is_mute;
+            success = 1;
+        }
     }
     return success;
 }
