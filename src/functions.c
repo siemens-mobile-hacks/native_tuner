@@ -8,3 +8,4 @@ int (*fmdl_set_freq)(uint32_t, int *, void *) = (int (*)(uint32_t freq, int *unk
 int (*fmdl_auto_search)(uint32_t, void *, void *) = (int (*)(uint32_t freq, void *unk, void *cb))(0xA0578BD4);
 
 int (*Obs_Sound_SetLogSourceEx)(HObj, uint8_t) = (int (*)(HObj, uint8_t))(0xA0CC3964);
+int (*Obs_GetUserPointer)(HObj, void *) = (int (*)(HObj, void *))(0xA0CB7E04);

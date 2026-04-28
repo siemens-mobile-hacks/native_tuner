@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "ipc.h"
+#include "cache.h"
 #include "common.h"
 #include "config.h"
 #include "keyhook.h"
 #include "bookmarks.h"
+#include "functions.h"
 #include "ui/ui.h"
 #include "csm.h"
 
@@ -14,6 +16,25 @@
 
 const int minus11 = -11;
 unsigned short maincsm_name_body[140];
+
+static int WriteCache(const MAIN_CSM *csm) {
+    CACHE cache;
+    cache.volume = csm->tuner.volume.volume;
+    cache.is_mute = csm->tuner.volume.is_mute;
+    cache.freq = csm->tuner.freq;
+    return Cache_Write(&cache);
+}
+
+static int ReadCache(MAIN_CSM *csm) {
+    CACHE cache;
+    if (Cache_Read(&cache)) {
+        csm->tuner.freq = cache.freq;
+        csm->tuner.volume.volume = cache.volume;
+        csm->tuner.volume.is_mute = cache.is_mute;
+        return 1;
+    }
+    return 0;
+}
 
 static void InitBackground() {
     KeyHook_Init();
@@ -28,10 +49,15 @@ static void DestroyBackground() {
 
 static void OnCreate(CSM_RAM *data) {
     MAIN_CSM *csm = (MAIN_CSM*)data;
-    if (!Tuner_Init(&csm->tuner)) {
+    if (!Tuner_Init(&csm->tuner, csm)) {
         csm->csm.state = CSM_STATE_CLOSED;
         return;
     }
+    if (!ReadCache(csm)) {
+        csm->tuner.freq = 104200;
+        csm->tuner.volume.volume = 5;
+    }
+    csm->tuner.volume.obs_volume = Tuner_MapVolume(csm->tuner.volume.volume);
     csm->gui_id = UI_Create(csm);
     SUBPROC(InitBackground);
 }
@@ -42,6 +68,9 @@ static void OnClose(CSM_RAM *data) {
         GeneralFunc_flag1(csm->please_wait_gui_id, 1);
     }
     GBS_DelTimer(&csm->tmr_set_stereo_status);
+    if (!WriteCache(csm)) {
+        MsgBoxError(1, (int)"Failed to write cache");
+    }
     Tuner_Destroy(&csm->tuner);
     Config_Save(csm);
     SUBPROC(DestroyBackground);
@@ -52,14 +81,27 @@ static UI_DATA *GetUIData(const MAIN_CSM *csm) {
     return (gui) ? TViewGetUserPointer(gui) : NULL;
 }
 
-static void Obs_Prepare_Handler(HObj hobj) {
+static void Obs_Prepare_Handler(const HObj hobj) {
+    MAIN_CSM *csm = NULL;
+    Obs_GetUserPointer(hobj, &csm);
     Obs_Sound_SetPurpose(hobj, 0x21);
     Obs_Mam_SetPurpose(hobj, 0x21);
+    if (csm) {
+        if (csm->tuner.volume.is_mute) {
+            Tuner_SetMute(&csm->tuner, 1);
+        } else {
+            Tuner_SetVolume(&csm->tuner, csm->tuner.volume.volume);
+        }
+    }
     Obs_Start(hobj);
 }
 
-static void Obs_2_Handler() {
-    Tuner_SetFreq(104200);
+static void Obs_2_Handler(const HObj hobj) {
+    MAIN_CSM *csm = NULL;
+    Obs_GetUserPointer(hobj, &csm);
+    if (csm) {
+        Tuner_SetFreq(csm->tuner.freq);
+    }
 }
 
 static OBSevent OBSeventHandlers[] = {

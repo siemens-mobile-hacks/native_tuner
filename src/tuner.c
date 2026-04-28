@@ -32,15 +32,15 @@ int Tuner_GetPowerState() {
     return fmdl_get_power_state();
 }
 
-int Tuner_Init(TUNER *tuner) {
+int Tuner_Init(TUNER *tuner, void *user_pointer) {
     zeromem(&tuner->volume, sizeof(TUNER_VOLUME));
     MutexCreate(&tuner->volume.mtx);
     if (Tuner_SetPower(1) == 0) {
         uint32_t err;
         tuner->hobj = Obs_CreateObject(0x4B,0x34,1,TUNER_MSG_OBS,1,0, &err);
         if (tuner->hobj) {
+            Obs_SetUserPointer(tuner->hobj, user_pointer);
             Obs_Sound_SetLogSourceEx(tuner->hobj, 3);
-            Tuner_SetVolume(tuner, 5);
             const int status = Obs_Prepare(tuner->hobj);
             if (status == 0 || status == 0x8006) {
                 return 1;
@@ -110,7 +110,7 @@ int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction) {
     return success;
 }
 
-static int MapVolume(int volume) {
+int Tuner_MapVolume(int volume) {
     switch (volume) {
         case 0:  return 0;
         case 1:  return 1;
@@ -130,7 +130,7 @@ static int MapVolume(int volume) {
 int Tuner_SetVolume(TUNER *tuner, int volume) {
     MutexLock(&tuner->volume.mtx);
     int success = 0;
-    const int obs_volume = MapVolume(volume);
+    const int obs_volume = Tuner_MapVolume(volume);
     const int status = Obs_Sound_SetVolumeEx(tuner->hobj, obs_volume, 1);
     if (status == 0 || status == 0x8006) {
         tuner->volume.volume = volume;
@@ -158,17 +158,21 @@ int Tuner_IncVolume(TUNER *tuner) {
     return Tuner_SetVolume(tuner, volume);
 }
 
-int Tuner_ToggleMute(TUNER *tuner) {
+int Tuner_SetMute(TUNER *tuner, int mute) {
     int success = 0;
     if (Tuner_GetPowerState() == 1) {
-        const int volume = (!tuner->volume.is_mute) ? 0 : tuner->volume.obs_volume;
+        const int volume = (mute) ? 0 : tuner->volume.obs_volume;
         const int status = Obs_Sound_SetVolumeEx(tuner->hobj, volume, 1);
         if (status == 0 || status == 0x8006) {
-            tuner->volume.is_mute = !tuner->volume.is_mute;
+            tuner->volume.is_mute = mute;
             success = 1;
         }
     }
     return success;
+}
+
+int Tuner_ToggleMute(TUNER *tuner) {
+    return Tuner_SetMute(tuner, !tuner->volume.is_mute);
 }
 
 void Tuner_SetCurrentLevel() {
