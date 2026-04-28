@@ -3,10 +3,12 @@
 #include <string.h>
 #include "ui.h"
 #include "icons.h"
+#include "set_freq.h"
 #include "../csm.h"
 #include "../config.h"
 
 enum {
+    ITEM_SET_FREQ,
     ITEM_THEME,
     ITEM_SETTINGS,
     ITEM_EXIT,
@@ -27,9 +29,14 @@ static const SOFTKEYSTAB SOFTKEYS_TAB = {
     SOFTKEYS_D,0
 };
 
+static void SetFreq_Proc(GUI *gui) {
+    SetFreq_Create();
+    GeneralFuncF1(1);
+}
+
 static void Theme_Proc(GUI *gui) {
-    void *data = MenuGetUserPointer(gui);
-    const UI_DATA *ui_data = TViewGetUserPointer(data);
+    void *main_gui = MenuGetUserPointer(gui);
+    const UI_DATA *ui_data = TViewGetUserPointer(main_gui);
     SUBPROC(UI_LoadTheme, (ui_data->csm->theme_type == UI_THEME_TYPE_WHITE) ? UI_THEME_TYPE_BLACK : UI_THEME_TYPE_WHITE);
     GeneralFuncF1(1);
 }
@@ -44,8 +51,8 @@ static void Settings_Proc(GUI *gui) {
 }
 
 static void Exit_Proc(GUI *gui) {
-    void *data = MenuGetUserPointer(gui);
-    const UI_DATA *ui_data = TViewGetUserPointer(data);
+    void *main_gui = MenuGetUserPointer(gui);
+    const UI_DATA *ui_data = TViewGetUserPointer(main_gui);
 
     GeneralFuncF1(1);
     GeneralFunc_flag1(ui_data->csm->gui_id, 1);
@@ -54,12 +61,14 @@ static void Exit_Proc(GUI *gui) {
 static int ICON[] = {ICON_EMPTY};
 
 static MENUITEM_DESC ITEMS[ITEMS_N] = {
+    {ICON, (int)"Set frequency", LGP_NULL, 0, NULL, MENU_FLAG3, MENU_FLAG2},
     {ICON, (int)"Theme", LGP_NULL, 0, NULL, MENU_FLAG3, MENU_FLAG2},
     {ICON, (int)"Settings", LGP_NULL, 0, NULL, MENU_FLAG3, MENU_FLAG2},
     {ICON, (int)"Exit", LGP_NULL, 0, NULL, MENU_FLAG3, MENU_FLAG2}
 };
 
 static const MENUPROCS_DESC PROCS[ITEMS_N] =  {
+    SetFreq_Proc,
     Theme_Proc,
     Settings_Proc,
     Exit_Proc
