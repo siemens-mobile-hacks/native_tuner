@@ -7,7 +7,7 @@
 uint32_t BOOKMARKS[MAX_BOOKMARKS];
 
 inline uint32_t ConvertBookmark(uint32_t freq) {
-    return (freq < TUNER_MIN_FREQ || freq > TUNER_MAX_FREQ) ? 0 : freq;
+    return !Tuner_IsValidFreq(freq) ? 0 : freq;
 }
 
 void Bookmarks_Serialize() {

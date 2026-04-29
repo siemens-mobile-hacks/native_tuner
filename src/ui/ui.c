@@ -5,7 +5,6 @@
 #include "layout.h"
 #include "menu_options.h"
 #include "../ipc.h"
-#include "../common.h"
 #include "../bookmarks.h"
 #include "ui.h"
 
@@ -40,7 +39,7 @@ void UI_DrawMainInfo(const UI_DATA *data) {
 
         if (!data->seek_on) {
             char str[32];
-            FreqToStr(str, data->csm->tuner.freq, 0);
+            Tuner_FreqToStr(str, data->csm->tuner.freq, 0);
             str_2ws(&ws, str, 127);
         } else {
             wsprintf(&ws, "...");

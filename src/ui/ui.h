@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../csm.h"
+#include "icons.h"
 #include "ui_theme.h"
 
 typedef enum {

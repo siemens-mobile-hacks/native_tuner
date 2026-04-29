@@ -15,8 +15,12 @@ int Cache_Read(CACHE *cache) {
                 fclose(file);
                 return 1;
             }
+            fclose(file);
+        } else {
+            fclose(file);
+            uint32_t err;
+            sys_unlink(PATH, &err);
         }
-        fclose(file);
     }
     return 0;
 }

@@ -23,12 +23,12 @@ int OnKey(GUI *gui, GUI_MSG *msg) {
         ws_2str(ec.pWS, number, 6);
 
         uint32_t freq = strtoull(number, NULL, 10);
-        if (freq < TUNER_MIN_FREQ || freq > TUNER_MAX_FREQ) {
-            MsgBoxError(1, (int)"Frequency is out of range");
-        } else {
+        if (Tuner_IsValidFreq(freq)) {
             Tuner_SetFreq(freq);
-            return 1;
+        } else {
+            MsgBoxError(1, (int)"Frequency is out of range");
         }
+        return 1;
     }
     return 0;
 }

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "ipc.h"
 #include "cache.h"
-#include "common.h"
 #include "config.h"
 #include "keyhook.h"
 #include "bookmarks.h"
@@ -11,13 +10,18 @@
 #include "ui/ui.h"
 #include "csm.h"
 
-#define CSM_STATE_DEFAULT 0
-#define CSM_STATE_UPDATE_INFO 0xA
+#define DEFAULT_FREQ 104200
+#define DEFAULT_VOLUME 5
+
+enum {
+    CSM_STATE_DEFAULT = 0x0,
+    CSM_STATE_UPDATE_INFO = 0xA
+};
 
 const int minus11 = -11;
 unsigned short maincsm_name_body[140];
 
-static int WriteCache(const MAIN_CSM *csm) {
+static int SaveTunerSettings(const MAIN_CSM *csm) {
     CACHE cache;
     cache.volume = csm->tuner.volume.volume;
     cache.is_mute = csm->tuner.volume.is_mute;
@@ -25,15 +29,19 @@ static int WriteCache(const MAIN_CSM *csm) {
     return Cache_Write(&cache);
 }
 
-static int ReadCache(MAIN_CSM *csm) {
+static void LoadTunerSettings(MAIN_CSM *csm) {
     CACHE cache;
     if (Cache_Read(&cache)) {
-        csm->tuner.freq = cache.freq;
-        csm->tuner.volume.volume = cache.volume;
+        const int volume = Tuner_IsValidVolume(cache.volume) ? cache.volume : DEFAULT_VOLUME;
+        const uint32_t freq = Tuner_IsValidFreq(cache.freq) ? cache.freq : DEFAULT_FREQ;
+        csm->tuner.freq = freq;
+        csm->tuner.volume.volume = volume;
         csm->tuner.volume.is_mute = cache.is_mute;
-        return 1;
+    } else {
+        csm->tuner.freq = DEFAULT_FREQ;
+        csm->tuner.volume.volume = DEFAULT_VOLUME;
     }
-    return 0;
+    csm->tuner.volume.obs_volume = Tuner_MapVolume(csm->tuner.volume.volume);
 }
 
 static void InitBackground() {
@@ -53,11 +61,7 @@ static void OnCreate(CSM_RAM *data) {
         csm->csm.state = CSM_STATE_CLOSED;
         return;
     }
-    if (!ReadCache(csm)) {
-        csm->tuner.freq = 104200;
-        csm->tuner.volume.volume = 5;
-    }
-    csm->tuner.volume.obs_volume = Tuner_MapVolume(csm->tuner.volume.volume);
+    LoadTunerSettings(csm);
     csm->gui_id = UI_Create(csm);
     SUBPROC(InitBackground);
 }
@@ -68,8 +72,8 @@ static void OnClose(CSM_RAM *data) {
         GeneralFunc_flag1(csm->please_wait_gui_id, 1);
     }
     GBS_DelTimer(&csm->tmr_set_stereo_status);
-    if (!WriteCache(csm)) {
-        MsgBoxError(1, (int)"Failed to write cache");
+    if (!SaveTunerSettings(csm)) {
+        MsgBoxError(1, (int)"Failed to save settings");
     }
     Tuner_Destroy(&csm->tuner);
     Config_Save(csm);
@@ -221,8 +225,8 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
         }
     }
     if (csm->csm.state == CSM_STATE_UPDATE_INFO) {
-        Tuner_SetCurrentLevel();
-        GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_SetStereoStatus);
+        Tuner_UpdateCurrentLevel();
+        GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_UpdateStereoStatus);
         csm->csm.state = CSM_STATE_DEFAULT;
     }
     return 1;
@@ -247,21 +251,21 @@ static const struct {
         &minus11
     },
     {
-    maincsm_name_body,
-    NAMECSM_MAGIC1,
-    NAMECSM_MAGIC2,
-    0x0,
-    139,
-    0
+        maincsm_name_body,
+        NAMECSM_MAGIC1,
+        NAMECSM_MAGIC2,
+        0x0,
+        139,
+        0
     }
 };
 
 void CSM_UpdateName(MAIN_CSM *csm) {
     WSHDR *ws = (WSHDR *)&MAINCSM.maincsm_name;
-    wsprintf(ws, "%c %s", (Tuner_GetPowerState() == 1) ? 0xE450 : 0xE44F, "FM");
+    wsprintf(ws, "%c %s", (Tuner_GetPowerState() == 1) ? FONT_ICON_PLAY : FONT_ICON_PAUSE, "FM");
     if (csm && csm->tuner.freq) {
         char s_freq[32];
-        FreqToStr(s_freq, csm->tuner.freq, 1);
+        Tuner_FreqToStr(s_freq, csm->tuner.freq, 1);
         wstrcatprintf(ws, " %s", s_freq);
     }
 }

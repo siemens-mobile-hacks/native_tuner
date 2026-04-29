@@ -1,4 +1,5 @@
 #include <swilib.h>
+#include <stdio.h>
 #include "ipc.h"
 #include "tuner.h"
 #include "functions.h"
@@ -12,15 +13,15 @@ static void CB_AutoSearch(int state, uint32_t freq) {
     IPC_SendMessage(IPC_TUNER_SEEK_FINISHED, NULL);
 }
 
-static void CB_GetCurrentLevel(int state, const uint8_t *level) {
+static void CB_UpdateCurrentLevel(int state, const uint8_t *level) {
     if ((state == 1 || state == 2) && level) {
-        IPC_SendMessage(IPC_TUNER_SET_CURRENT_LEVEL, (void*)*(int*)level);
+        IPC_SendMessage(IPC_TUNER_SET_CURRENT_LEVEL, (void*)(int)*level);
     }
 }
 
-static void CB_GetStereoStatus(int state, const uint8_t *stereo) {
+static void CB_UpdateStereoStatus(int state, const uint8_t *stereo) {
     if ((state == 1 || state == 2) && stereo) {
-        IPC_SendMessage(IPC_TUNER_SET_STEREO_STATUS, (void*)*(int*)stereo);
+        IPC_SendMessage(IPC_TUNER_SET_STEREO_STATUS, (void*)(int)*stereo);
     }
 }
 
@@ -87,6 +88,14 @@ int Tuner_IncFreq(const TUNER *tuner) {
         return 0;
     }
     return Tuner_SetFreq(tuner->freq + 100);
+}
+
+int Tuner_IsValidFreq(uint32_t freq) {
+    return (freq >= TUNER_MIN_FREQ && freq <= TUNER_MAX_FREQ);
+}
+
+void Tuner_FreqToStr(char *str, uint32_t freq, int append_units) {
+    sprintf(str, "%.1f %s", freq / 1000.0, (append_units) ? " MHz" : "");
 }
 
 int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction) {
@@ -158,6 +167,10 @@ int Tuner_IncVolume(TUNER *tuner) {
     return Tuner_SetVolume(tuner, volume);
 }
 
+int Tuner_IsValidVolume(int volume) {
+    return (volume >= 0 && volume <= 10);
+}
+
 int Tuner_SetMute(TUNER *tuner, int mute) {
     int success = 0;
     if (Tuner_GetPowerState() == 1) {
@@ -175,10 +188,10 @@ int Tuner_ToggleMute(TUNER *tuner) {
     return Tuner_SetMute(tuner, !tuner->volume.is_mute);
 }
 
-void Tuner_SetCurrentLevel() {
-    fmdl_get_current_level(CB_GetCurrentLevel);
+void Tuner_UpdateCurrentLevel() {
+    fmdl_get_current_level(CB_UpdateCurrentLevel);
 }
 
-void Tuner_SetStereoStatus() {
-    fmdl_get_stereo_status(CB_GetStereoStatus);
+void Tuner_UpdateStereoStatus() {
+    fmdl_get_stereo_status(CB_UpdateStereoStatus);
 }

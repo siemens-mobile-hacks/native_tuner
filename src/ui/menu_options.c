@@ -2,7 +2,6 @@
 #include <swilib.h>
 #include <string.h>
 #include "ui.h"
-#include "icons.h"
 #include "set_freq.h"
 #include "../csm.h"
 #include "../config.h"

@@ -34,13 +34,15 @@ int Tuner_GetPowerState();
 int Tuner_SetFreq(uint32_t freq);
 int Tuner_DecFreq(const TUNER *tuner);
 int Tuner_IncFreq(const TUNER *tuner);
+int Tuner_IsValidFreq(uint32_t freq);
+void Tuner_FreqToStr(char *str, uint32_t freq, int append_units);
 int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction);
 int Tuner_MapVolume(int volume);
 int Tuner_SetVolume(TUNER *tuner, int volume);
 int Tuner_DecVolume(TUNER *tuner);
 int Tuner_IncVolume(TUNER *tuner);
+int Tuner_IsValidVolume(int volume);
 int Tuner_SetMute(TUNER *tuner, int mute);
 int Tuner_ToggleMute(TUNER *tuner);
-void Tuner_SetCurrentLevel();
-void Tuner_SetStereoStatus();
-
+void Tuner_UpdateCurrentLevel();
+void Tuner_UpdateStereoStatus();
