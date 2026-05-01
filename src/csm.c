@@ -6,7 +6,6 @@
 #include "config.h"
 #include "keyhook.h"
 #include "bookmarks.h"
-#include "functions.h"
 #include "ui/ui.h"
 #include "csm.h"
 
@@ -14,7 +13,6 @@
 #define DEFAULT_VOLUME 5
 
 enum {
-    CSM_STATE_DEFAULT = 0x0,
     CSM_STATE_UPDATE_INFO = 0xA
 };
 
@@ -87,7 +85,7 @@ static UI_DATA *GetUIData(const MAIN_CSM *csm) {
 
 static void Obs_Prepare_Handler(const HObj hobj) {
     MAIN_CSM *csm = NULL;
-    Obs_GetUserPointer(hobj, &csm);
+    Obs_GetUserPointer(hobj, (void**)&csm);
     Obs_Sound_SetPurpose(hobj, 0x21);
     Obs_Mam_SetPurpose(hobj, 0x21);
     if (csm) {
@@ -102,7 +100,7 @@ static void Obs_Prepare_Handler(const HObj hobj) {
 
 static void Obs_2_Handler(const HObj hobj) {
     MAIN_CSM *csm = NULL;
-    Obs_GetUserPointer(hobj, &csm);
+    Obs_GetUserPointer(hobj, (void**)&csm);
     if (csm) {
         Tuner_SetFreq(csm->tuner.freq);
     }
@@ -227,7 +225,7 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     if (csm->csm.state == CSM_STATE_UPDATE_INFO) {
         Tuner_UpdateCurrentLevel();
         GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_UpdateStereoStatus);
-        csm->csm.state = CSM_STATE_DEFAULT;
+        csm->csm.state = CSM_STATE_OPEN;
     }
     return 1;
 }
