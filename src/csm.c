@@ -42,9 +42,17 @@ static void LoadTunerSettings(MAIN_CSM *csm) {
     csm->tuner.volume.obs_volume = Tuner_MapVolume(csm->tuner.volume.volume);
 }
 
+static UI_THEME_TYPE GetThemeType() {
+    UI_THEME_TYPE type = CFG.theme_type;
+    if (type == UI_THEME_TYPE_RED && CFG.has_red_theme == 0) {
+        type = UI_THEME_TYPE_BLACK;
+    }
+    return type;
+}
+
 static void InitBackground() {
     KeyHook_Init();
-    UI_LoadTheme(CFG.theme_type);
+    UI_LoadTheme(GetThemeType());
 }
 
 static void DestroyBackground() {
@@ -212,12 +220,13 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
     } else if (msg->msg == MSG_RECONFIGURE_REQ) {
         if (strcmp(CFG_PATH, msg->data0) == 0) {
             Config_Init();
+            const int theme_type = GetThemeType();
+            if (csm->theme_type != theme_type) {
+                SUBPROC(UI_LoadTheme, theme_type);
+            }
             UI_DATA *ui_data = GetUIData(csm);
             if (ui_data) {
                 ui_data->bm = Bookmarks_Find(csm->tuner.freq);
-            }
-            if (csm->theme_type != CFG.theme_type) {
-                SUBPROC(UI_LoadTheme, CFG.theme_type);
             }
             ShowMSG(1, (int)"NativeTuner config updated!");
         }

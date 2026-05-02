@@ -36,7 +36,13 @@ static void SetFreq_Proc(GUI *gui) {
 static void Theme_Proc(GUI *gui) {
     void *main_gui = MenuGetUserPointer(gui);
     const UI_DATA *ui_data = TViewGetUserPointer(main_gui);
-    SUBPROC(UI_LoadTheme, (ui_data->csm->theme_type == UI_THEME_TYPE_WHITE) ? UI_THEME_TYPE_BLACK : UI_THEME_TYPE_WHITE);
+
+    uint32_t themes_count = (CFG.has_red_theme) ? 3 : 2;
+    UI_THEME_TYPE theme_type = ui_data->csm->theme_type + 1;
+    if (theme_type >= themes_count) {
+        theme_type = UI_THEME_TYPE_WHITE;
+    }
+    SUBPROC(UI_LoadTheme, theme_type);
     GeneralFuncF1(1);
 }
 
@@ -73,13 +79,29 @@ static const MENUPROCS_DESC PROCS[ITEMS_N] =  {
     Exit_Proc
 };
 
+static void GetThemeName(char *name, UI_THEME_TYPE theme_type) {
+    switch (theme_type) {
+        case UI_THEME_TYPE_WHITE:
+            strcpy(name, "White");
+        break;
+        case UI_THEME_TYPE_BLACK:
+            strcpy(name, "Black");
+        break;
+        case UI_THEME_TYPE_RED:
+            strcpy(name, "Red");
+        break;
+    }
+}
+
 static void ItemProc(void *gui, int item_n, void *user_pointer) {
     const UI_DATA *ui_data = TViewGetUserPointer(user_pointer);
     const MENUITEM_DESC *desc = &ITEMS[item_n];
     void *item = AllocMenuItem(gui);
     WSHDR *ws = AllocMenuWS(gui, 128);
     if (item_n == ITEM_THEME) {
-        wsprintf(ws, "%t [%s]", desc->lgp_id_small, (ui_data->csm->theme_type == UI_THEME_TYPE_WHITE) ? "White" : "Black");
+        char theme_name[16];
+        GetThemeName(theme_name, ui_data->csm->theme_type);
+        wsprintf(ws, "%t [%s]", desc->lgp_id_small, theme_name);
     } else {
         wsprintf(ws, "%t", desc->lgp_id_small);
     }

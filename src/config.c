@@ -5,9 +5,11 @@
 #include "ui/ui_theme_type.h"
 
 CONFIG CFG = {
-    {CFG_CBOX, "Theme", 0, 2},
+    {CFG_CHECKBOX, "Red theme", 0, 1},
+    0,
+    {CFG_CBOX, "Theme", 0, 3},
     UI_THEME_TYPE_BLACK,
-    {{"White"}, {"Black"}},
+    {{"White"}, {"Black"}, {"Red"}},
     {CFG_LEVEL, "Bookmarks", 1, 0},
     {CFG_UINT, "Bookmark 1 (kHz)", 0, TUNER_MAX_FREQ},
     0,

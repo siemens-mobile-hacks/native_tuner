@@ -6,8 +6,10 @@
 #pragma pack(push, 1)
 typedef struct {
     const CFG_HDR cfghdr_0;
+    unsigned int has_red_theme;
+    const CFG_HDR cfghdr_1;
     unsigned int theme_type;
-    const CFG_CBOX_ITEM cfgcbox_0[2];
+    const CFG_CBOX_ITEM cfgcbox_1[3];
     const CFG_HDR cfghdr_b_b;
     const CFG_HDR cfghdr_b_0;
     unsigned int bm0;

@@ -21,12 +21,27 @@ const char *FILE_NAMES[IMG_COUNT] = {
     "Stereo"
 };
 
-void GetFileName(char *path, UI_IMG img, UI_THEME_TYPE theme_type) {
+static void GetFileName(char *path, UI_IMG img, UI_THEME_TYPE theme_type) {
+    uint8_t prefix;
     const char *dir = "2:\\japp\\fmradio\\fmradio\\images";
-    sprintf(path, "%s\\%s_%s.png", dir, (theme_type == UI_THEME_TYPE_WHITE) ? "W" : "B", FILE_NAMES[img]);
+    switch (theme_type) {
+        case UI_THEME_TYPE_WHITE:
+            prefix = 'W';
+        break;
+        case UI_THEME_TYPE_BLACK:
+            prefix = 'B';
+        break;
+        case UI_THEME_TYPE_RED:
+            prefix = 'R';
+        break;
+        default:
+            prefix = 'W';
+        break;
+    }
+    sprintf(path, "%s\\%c_%s.png", dir, prefix, FILE_NAMES[img]);
 }
 
-void DestroyIMGHDR(IMGHDR **img) {
+static void DestroyIMGHDR(IMGHDR **img) {
     if (*img) {
         mfree((*img)->bitmap);
         mfree((*img));
@@ -34,7 +49,7 @@ void DestroyIMGHDR(IMGHDR **img) {
     }
 }
 
-void DestroyThemeImages(IMGHDR ***images) {
+static void DestroyThemeImages(IMGHDR ***images) {
     if (*images) {
         for (int i = 0; i < IMG_COUNT; i++) {
             DestroyIMGHDR(&(*images)[i]);
