@@ -31,6 +31,7 @@ void Tuner_Destroy(TUNER *tuner);
 
 int Tuner_SetPower(int power);
 int Tuner_GetPowerState();
+void Tuner_TogglePower();
 int Tuner_SetFreq(uint32_t freq);
 int Tuner_DecFreq(const TUNER *tuner);
 int Tuner_IncFreq(const TUNER *tuner);

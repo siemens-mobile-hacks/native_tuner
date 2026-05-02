@@ -33,6 +33,10 @@ int Tuner_GetPowerState() {
     return fmdl_get_power_state();
 }
 
+void Tuner_TogglePower() {
+    IPC_SendMessage(IPC_TUNER_SET_POWER, (void*)!Tuner_GetPowerState());
+}
+
 int Tuner_Init(TUNER *tuner, void *user_pointer) {
     zeromem(&tuner->volume, sizeof(TUNER_VOLUME));
     MutexCreate(&tuner->volume.mtx);

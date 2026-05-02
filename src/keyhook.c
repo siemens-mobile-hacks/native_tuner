@@ -14,6 +14,8 @@ int KeyHook(int submess, int msg) {
                 IPC_SendMessage(IPC_VOL_DOWN, NULL);
                 return KEYHOOK_BREAK;
             }
+        } else if (submess == PTT_BUTTON) {
+            Tuner_TogglePower();
         }
     }
     return KEYHOOK_NEXT;
