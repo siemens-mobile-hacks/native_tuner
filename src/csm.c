@@ -110,7 +110,7 @@ static void Obs_2_Handler(const HObj hobj) {
     MAIN_CSM *csm = NULL;
     Obs_GetUserPointer(hobj, (void**)&csm);
     if (csm) {
-        Tuner_SetFreq(csm->tuner.freq);
+        Tuner_SetFreqAsync(csm->tuner.freq);
     }
 }
 
@@ -232,8 +232,8 @@ static int OnMessage(CSM_RAM *data, GBS_MSG *msg) {
         }
     }
     if (csm->csm.state == CSM_STATE_UPDATE_INFO) {
-        Tuner_UpdateCurrentLevel();
-        GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_UpdateStereoStatus);
+        Tuner_UpdateCurrentLevelAsync();
+        GBS_StartTimerProc(&csm->tmr_set_stereo_status, MsToTicks(100), (void*)Tuner_UpdateStereoStatusAsync);
         csm->csm.state = CSM_STATE_OPEN;
     }
     return 1;

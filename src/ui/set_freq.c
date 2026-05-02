@@ -24,7 +24,7 @@ int OnKey(GUI *gui, GUI_MSG *msg) {
 
         uint32_t freq = strtoull(number, NULL, 10);
         if (Tuner_IsValidFreq(freq)) {
-            Tuner_SetFreq(freq);
+            Tuner_SetFreqAsync(freq);
         } else {
             MsgBoxError(1, (int)"Frequency is out of range");
         }

@@ -197,7 +197,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
         MenuOptions_Create(gui);
         return -1;
     } else if (msg->keys == 0x3D) {
-        Tuner_TogglePower();
+        Tuner_TogglePowerAsync();
         return -1;
     } else if (msg->keys == 0x01) {
         return 1;
@@ -217,7 +217,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
                 }
                 if (bm >= 0 && bm != data->bm) {
                     const uint32_t freq = BOOKMARKS[bm];
-                    if (Tuner_SetFreq(freq)) {
+                    if (Tuner_SetFreqAsync(freq)) {
                         UI_DrawArrowUp(data);
                     }
                 } else {
@@ -230,7 +230,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
                 }
                 if (bm >= 0 && bm != data->bm) {
                     const uint32_t freq = BOOKMARKS[bm];
-                    if (Tuner_SetFreq(freq)) {
+                    if (Tuner_SetFreqAsync(freq)) {
                         UI_DrawArrowDown(data);
                     }
                 } else {
@@ -247,14 +247,14 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
         } else { // LONG_PRESS
             if (submess == LEFT_BUTTON) {
                 if (!lock_seek) {
-                    if (Tuner_Seek(data->csm->tuner.freq, TUNER_SEEK_DOWN)) {
+                    if (Tuner_SeekAsync(data->csm->tuner.freq, TUNER_SEEK_DOWN)) {
                         UI_DrawArrowLeft(data);
                         lock_seek = 1;
                     }
                 }
             } else if (submess == RIGHT_BUTTON) {
                 if (!lock_seek) {
-                    if (Tuner_Seek(data->csm->tuner.freq, TUNER_SEEK_UP)) {
+                    if (Tuner_SeekAsync(data->csm->tuner.freq, TUNER_SEEK_UP)) {
                         UI_DrawArrowRight(data);
                         lock_seek = 1;
                     }
@@ -277,7 +277,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
     } else if (msg->gbsmsg->msg == KEY_UP) {
         if (submess == LEFT_BUTTON) {
             if (!lock_seek) {
-                if (Tuner_DecFreq(&data->csm->tuner)) {
+                if (Tuner_DecFreqAsync(&data->csm->tuner)) {
                     UI_DrawMainInfo(data);
                     UI_DrawArrowLeft(data);
                     GUI_StartTimerProc(gui, data->tmr_redraw, 100, (void(*)(void*))DirectRedrawGUI);
@@ -285,7 +285,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
             }
         } else if (submess == RIGHT_BUTTON) {
             if (!lock_seek) {
-                if (Tuner_IncFreq(&data->csm->tuner)) {
+                if (Tuner_IncFreqAsync(&data->csm->tuner)) {
                     UI_DrawMainInfo(data);
                     UI_DrawArrowRight(data);
                     GUI_StartTimerProc(gui, data->tmr_redraw, 100, (void(*)(void*))DirectRedrawGUI);
@@ -301,7 +301,7 @@ static int OnKey(GUI *gui, GUI_MSG *msg) {
                     const int id = submess - '0' - 1;
                     const uint32_t freq = BOOKMARKS[id];
                     if (freq >= TUNER_MIN_FREQ && freq <= TUNER_MAX_FREQ) {
-                        Tuner_SetFreq(freq);
+                        Tuner_SetFreqAsync(freq);
                     }
                 }
             }

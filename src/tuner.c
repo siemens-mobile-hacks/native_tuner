@@ -9,7 +9,7 @@ static void CB_SetFreq() {
 }
 
 static void CB_AutoSearch(int state, uint32_t freq) {
-    Tuner_SetFreq(freq);
+    Tuner_SetFreqAsync(freq);
     IPC_SendMessage(IPC_TUNER_SEEK_FINISHED, NULL);
 }
 
@@ -33,7 +33,7 @@ int Tuner_GetPowerState() {
     return fmdl_get_power_state();
 }
 
-void Tuner_TogglePower() {
+void Tuner_TogglePowerAsync() {
     IPC_SendMessage(IPC_TUNER_SET_POWER, (void*)!Tuner_GetPowerState());
 }
 
@@ -64,7 +64,7 @@ void Tuner_Destroy(TUNER *tuner) {
     MutexDestroy(&tuner->volume.mtx);
 }
 
-int Tuner_SetFreq(uint32_t freq) {
+int Tuner_SetFreqAsync(uint32_t freq) {
     int success = 0;
     freq = ((freq + 50) / 100) * 100; // round
     if (freq < TUNER_MIN_FREQ) {
@@ -80,18 +80,18 @@ int Tuner_SetFreq(uint32_t freq) {
     return success;
 }
 
-int Tuner_DecFreq(const TUNER *tuner) {
+int Tuner_DecFreqAsync(const TUNER *tuner) {
     if (tuner->freq < TUNER_MIN_FREQ + 100) {
         return 0;
     }
-    return Tuner_SetFreq(tuner->freq - 100);
+    return Tuner_SetFreqAsync(tuner->freq - 100);
 }
 
-int Tuner_IncFreq(const TUNER *tuner) {
+int Tuner_IncFreqAsync(const TUNER *tuner) {
     if (tuner->freq > TUNER_MAX_FREQ - 100) {
         return 0;
     }
-    return Tuner_SetFreq(tuner->freq + 100);
+    return Tuner_SetFreqAsync(tuner->freq + 100);
 }
 
 int Tuner_IsValidFreq(uint32_t freq) {
@@ -102,7 +102,7 @@ void Tuner_FreqToStr(char *str, uint32_t freq, int append_units) {
     sprintf(str, "%.1f %s", freq / 1000.0, (append_units) ? " MHz" : "");
 }
 
-int Tuner_Seek(uint32_t start_freq, TunerSeekDirection direction) {
+int Tuner_SeekAsync(uint32_t start_freq, TunerSeekDirection direction) {
     int success = 0;
     if (direction == TUNER_SEEK_DOWN) {
         start_freq -= 100;
@@ -192,10 +192,10 @@ int Tuner_ToggleMute(TUNER *tuner) {
     return Tuner_SetMute(tuner, !tuner->volume.is_mute);
 }
 
-void Tuner_UpdateCurrentLevel() {
+void Tuner_UpdateCurrentLevelAsync() {
     fmdl_get_current_level(CB_UpdateCurrentLevel);
 }
 
-void Tuner_UpdateStereoStatus() {
+void Tuner_UpdateStereoStatusAsync() {
     fmdl_get_stereo_status(CB_UpdateStereoStatus);
 }

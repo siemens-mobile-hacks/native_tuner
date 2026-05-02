@@ -15,7 +15,7 @@ int KeyHook(int submess, int msg) {
                 return KEYHOOK_BREAK;
             }
         } else if (submess == PTT_BUTTON) {
-            Tuner_TogglePower();
+            Tuner_TogglePowerAsync();
         }
     }
     return KEYHOOK_NEXT;
